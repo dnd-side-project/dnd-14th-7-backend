@@ -43,15 +43,15 @@ public class ResponseDTO<T> {
         .build();
   }
 
-  public static <T> ResponseDTO<T> error(ErrorCode errorCode, String overrideMessage) {
-    return ResponseDTO.<T>builder()
-            .localDateTime(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
-            .statusCode(errorCode.getCode())
-            .responseCode(errorCode.getActualStatusCode())
-            .message(overrideMessage)
-            .data(null)
-            .build();
-  }
+//  public static <T> ResponseDTO<T> error(ErrorCode errorCode, String overrideMessage) {
+//    return ResponseDTO.<T>builder()
+//            .localDateTime(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+//            .statusCode(errorCode.getCode())
+//            .responseCode(errorCode.getActualStatusCode())
+//            .message(overrideMessage)
+//            .data(null)
+//            .build();
+//  }
   
   public static <T> ResponseDTO<T> of(T data, String message) {
     return ResponseDTO.<T>builder()
