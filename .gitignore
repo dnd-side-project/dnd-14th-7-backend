@@ -1,9 +1,7 @@
 HELP.md
 .gradle
 
-application.yaml
-application-dev.yaml
-application-prod.yaml
+.env
 
 build/
 !gradle/wrapper/gradle-wrapper.jar
