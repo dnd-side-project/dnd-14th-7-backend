@@ -2,6 +2,9 @@ package com.dnd.ahaive.global.security.config;
 
 import com.dnd.ahaive.global.common.response.ResponseDTO;
 import com.dnd.ahaive.global.exception.ErrorCode;
+import com.dnd.ahaive.global.oauth2.OAuth2LoginSuccessHandler;
+import com.dnd.ahaive.global.oauth2.OAuth2UserService;
+import com.dnd.ahaive.global.security.jwt.JwtTokenFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -22,6 +26,7 @@ public class SecurityConfig {
    * 예외처리 응답을 위해 사용되는 객체입니다.
    */
   private final ObjectMapper objectMapper;
+  private final OAuth2UserService OAuth2UserService;
 
   @Bean
   public BCryptPasswordEncoder passwordEncoder() {
@@ -29,7 +34,8 @@ public class SecurityConfig {
   }
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtTokenFilter jwtTokenFilter,
+      OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler) throws Exception {
 
     // 인증 실패 시 반환할 JSON 응답
     String invalidAuthenticationResponse = objectMapper
@@ -67,7 +73,18 @@ public class SecurityConfig {
               response.setStatus(HttpStatus.UNAUTHORIZED.value());
               response.setContentType("application/json");
               response.getWriter().write(invalidAuthorizationResponse);
-            }));
+            }))
+        .oauth2Login(oauth2 -> oauth2
+            .authorizationEndpoint(authorization -> authorization
+                .baseUri("/oauth2/authorization")
+            )
+            .redirectionEndpoint(redirection -> redirection
+                .baseUri("/login/oauth2/code/*"))
+            .userInfoEndpoint(userInfo -> userInfo
+                .userService(OAuth2UserService))
+            .successHandler(oAuth2LoginSuccessHandler)
+        )
+        .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
   }
 
