@@ -5,10 +5,13 @@ import com.dnd.ahaive.global.exception.ErrorCode;
 import com.dnd.ahaive.global.security.exception.InvalidAccessJwtException;
 import com.dnd.ahaive.global.security.exception.InvalidRefrashJwtException;
 import com.dnd.ahaive.global.security.exception.TokenExtractionException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Base64;
 import java.util.Date;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
@@ -102,14 +105,21 @@ public class JwtTokenProvider {
 
 
   public JwtTokenType getTypeFromToken(String token) {
-    String type = Jwts.parser()
-        .unsecured()
-        .build()
-        .parseUnsecuredClaims(token)
-        .getPayload()
-        .get("type", String.class);
+    try {
+      String[] chunks = token.split("\\.");
+      Base64.Decoder decoder = Base64.getUrlDecoder();
 
-    return JwtTokenType.valueOf(type);
+      String payload = new String(decoder.decode(chunks[1]));
+      ObjectMapper mapper = new ObjectMapper();
+      JsonNode payloadJson = mapper.readTree(payload);
+
+      String type = payloadJson.get("type").asText();
+      return JwtTokenType.valueOf(type);
+
+    } catch (Exception e) {
+      log.error("토큰 타입 추출 실패: {}", e.getMessage());
+      throw new TokenExtractionException(ErrorCode.TOKEN_INVALID);
+    }
   }
 
   public Role getRoleFromToken(String token) {

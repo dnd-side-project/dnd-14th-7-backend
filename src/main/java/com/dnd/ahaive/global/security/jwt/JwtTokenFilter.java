@@ -90,6 +90,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
   private void handleAccessTokenInvalid(HttpServletResponse response) throws IOException {
     String errorResponse = objectMapper.writeValueAsString(ResponseDTO.of(ErrorCode.ACCESS_TOKEN_INVALID));
+    response.setContentType("application/json;charset=UTF-8");
     response.setStatus(HttpStatus.UNAUTHORIZED.value());
     response.setContentType("application/json");
     response.getWriter().write(errorResponse);
@@ -97,6 +98,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
   private void handleRefreshTokenInvalid(HttpServletResponse response) throws IOException {
     String errorResponse = objectMapper.writeValueAsString(ResponseDTO.of(ErrorCode.REFRESH_TOKEN_INVALID));
+    response.setContentType("application/json;charset=UTF-8");
     response.setStatus(HttpStatus.UNAUTHORIZED.value());
     response.setContentType("application/json");
     response.getWriter().write(errorResponse);
