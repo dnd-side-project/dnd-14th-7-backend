@@ -53,7 +53,6 @@ public class SecurityConfig {
             .requestMatchers(
                 "/swagger-ui/**",
                 "/v3/api-docs/**",
-                "/api/**",
                 "/oauth2/**",
                 "/login/oauth2/code/**",
                 "/api/auth/**"
@@ -63,6 +62,7 @@ public class SecurityConfig {
         .exceptionHandling(e -> e
             //인증 실패 시 응답 핸들링
             .authenticationEntryPoint(((request, response, authException) -> {
+              response.setContentType("application/json;charset=UTF-8");
               response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
               response.setContentType("application/json");
               response.getWriter().write(invalidAuthenticationResponse);
@@ -70,6 +70,7 @@ public class SecurityConfig {
             ))
             //인가 실패 시 응답 핸들링
             .accessDeniedHandler((request, response, authException) -> {
+              response.setContentType("application/json;charset=UTF-8");
               response.setStatus(HttpStatus.UNAUTHORIZED.value());
               response.setContentType("application/json");
               response.getWriter().write(invalidAuthorizationResponse);

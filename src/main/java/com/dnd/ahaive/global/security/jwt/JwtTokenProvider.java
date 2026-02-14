@@ -139,7 +139,7 @@ public class JwtTokenProvider {
       token = token.substring(7);
     } else {
       log.error("Authorization 헤더가 없거나 Bearer 로 시작하지 않습니다.");
-      throw new TokenExtractionException(ErrorCode.TOKEN_EXTRACTION_FAILED);
+      return null;
     }
 
     return token;
