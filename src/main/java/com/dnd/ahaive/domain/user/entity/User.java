@@ -20,7 +20,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
     name = "users",
-    indexes = @Index(name = "idx_user_uuid", columnList = "userUuid", unique = true)
+    indexes = {
+        @Index(name = "idx_user_uuid", columnList = "userUuid", unique = true),
+        @Index(name = "idx_provider_id", columnList = "providerId", unique = true)
+    }
+
 )
 public class User extends BaseEntity {
 
@@ -33,6 +37,8 @@ public class User extends BaseEntity {
   private Role role;
 
   private String nickname;
+
+  private String email;
 
   private int credit;
 
@@ -47,12 +53,14 @@ public class User extends BaseEntity {
       Role role,
       String nickname,
       int credit,
+      String email,
       Provider provider,
       String providerId) {
     this.userUuid = userUuid;
     this.role = role;
     this.nickname = nickname;
     this.credit = credit;
+    this.email = email;
     this.provider = provider;
     this.providerId = providerId;
   }
@@ -68,12 +76,13 @@ public class User extends BaseEntity {
         .build();
   }
 
-  public static User createMember(String nickname, int credit, Provider provider, String providerId) {
+  public static User createMember(String nickname, int credit, String email, Provider provider, String providerId) {
     return User.builder()
         .userUuid(UUID.randomUUID().toString())
         .role(Role.MEMBER)
         .nickname(nickname)
         .credit(credit)
+        .email(email)
         .provider(provider)
         .providerId(providerId)
         .build();
