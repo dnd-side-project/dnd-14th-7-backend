@@ -87,6 +87,18 @@ public class JwtTokenProvider {
     }
   }
 
+  public boolean isValidToken(String token) {
+    try {
+      Jwts.parser()
+          .verifyWith(secretKey)
+          .build()
+          .parseSignedClaims(token);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
 
 
   public JwtTokenType getTypeFromToken(String token) {
@@ -118,6 +130,20 @@ public class JwtTokenProvider {
         .parseSignedClaims(token)
         .getPayload()
         .get("userUuid", String.class);
+  }
+
+  public String getTokenFromRequest(HttpServletRequest request) {
+    String token = request.getHeader("Authorization");
+
+    if (token != null && token.startsWith("Bearer ")) {
+      token = token.substring(7);
+    } else {
+      log.error("Authorization 헤더가 없거나 Bearer 로 시작하지 않습니다.");
+      throw new TokenExtractionException(ErrorCode.TOKEN_EXTRACTION_FAILED);
+    }
+
+    return token;
+
   }
 
   public String extractToken(HttpServletRequest request) {
