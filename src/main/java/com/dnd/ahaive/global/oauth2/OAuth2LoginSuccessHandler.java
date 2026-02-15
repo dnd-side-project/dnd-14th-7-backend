@@ -33,9 +33,11 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
+        String accessToken = (String) attributes.get("accessToken");
         String refreshToken = (String) attributes.get("refreshToken");
 
-        response.sendRedirect("http://localhost:8080?refreshToken=" + refreshToken);
+        response.sendRedirect("http://localhost:3000?accessToken=" + accessToken + "&refreshToken=" + refreshToken);
+
 
     }
 }
