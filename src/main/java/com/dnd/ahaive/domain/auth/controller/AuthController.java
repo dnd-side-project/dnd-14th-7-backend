@@ -2,8 +2,8 @@ package com.dnd.ahaive.domain.auth.controller;
 
 import com.dnd.ahaive.domain.auth.dto.response.TokenResponse;
 import com.dnd.ahaive.domain.auth.exception.RefreshTokenInvalid;
-import com.dnd.ahaive.domain.auth.exception.TokenInvalid;
 import com.dnd.ahaive.domain.auth.exception.TokenInvalidType;
+import com.dnd.ahaive.domain.auth.exception.TokenNotFound;
 import com.dnd.ahaive.domain.auth.service.AuthService;
 import com.dnd.ahaive.global.common.response.ResponseDTO;
 import com.dnd.ahaive.global.exception.ErrorCode;
@@ -31,7 +31,7 @@ public class AuthController {
 
     // 리프레시 토큰이 헤더에 없을 경우
     if(refreshToken == null || refreshToken.isEmpty()){
-      throw new TokenInvalid(ErrorCode.TOKEN_INVALID);
+      throw new TokenNotFound(ErrorCode.TOKEN_NOT_FOUND);
     }
 
     // 리프레시 토큰 형식이 잘못됐을 경우(Bearer로 시작하지 않을 경우)
