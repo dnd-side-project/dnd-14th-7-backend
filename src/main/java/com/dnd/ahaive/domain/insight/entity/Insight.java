@@ -66,4 +66,7 @@ public class Insight extends BaseEntity {
                 .build();
     }
 
+    public boolean isNotWrittenBy(String username) {
+        return user.isNotSameUser(username);
+    }
 }
