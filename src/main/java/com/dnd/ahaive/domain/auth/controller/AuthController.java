@@ -10,8 +10,6 @@ import com.dnd.ahaive.global.exception.ErrorCode;
 import com.dnd.ahaive.global.security.jwt.JwtTokenProvider;
 import com.dnd.ahaive.global.security.jwt.JwtTokenType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +24,7 @@ public class AuthController {
   private final JwtTokenProvider jwtTokenProvider;
 
   @PostMapping("/refresh")
-  public ResponseEntity<ResponseDTO<TokenResponse>> refreshAccessToken(
+  public ResponseDTO<TokenResponse> refreshAccessToken(
       @RequestHeader(value = "Authorization", required = false) String refreshToken) {
 
     // 리프레시 토큰이 헤더에 없을 경우
@@ -55,11 +53,7 @@ public class AuthController {
     }
 
     TokenResponse tokenResponse = authService.refreshAccessToken(token);
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(
-            ResponseDTO.of(tokenResponse, "엑세스, 리프레시 토큰이 재발급되었습니다.")
-        );
+    return ResponseDTO.of(tokenResponse, "엑세스, 리프레시 토큰이 재발급되었습니다.");
 
   }
 
