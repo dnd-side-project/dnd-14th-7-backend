@@ -1,5 +1,6 @@
 package com.dnd.ahaive.domain.question.controller;
 
+import com.dnd.ahaive.domain.question.controller.dto.TotalArchivedQuestionResponse;
 import com.dnd.ahaive.domain.question.controller.dto.TotalQuestionDto;
 import com.dnd.ahaive.domain.question.service.QuestionService;
 import com.dnd.ahaive.global.common.response.ResponseDTO;
@@ -18,12 +19,26 @@ public class QuestionController {
 
     private final QuestionService questionService;
 
+    /**
+     * 질문 리스트 조회
+     */
     @GetMapping("/api/v1/insights/{id}/questions")
     @ResponseStatus(code = HttpStatus.OK)
     public ResponseDTO<TotalQuestionDto> questions(@PathVariable("id") long insightId, @AuthenticationPrincipal
                                                    UserDetails userDetails) {
         TotalQuestionDto totalQuestionDto = questionService.findQuestionAndAnswers(insightId, userDetails.getUsername());
         return ResponseDTO.of(totalQuestionDto, "success");
+    }
+
+    /**
+     * 이전 질문 리스트 조회
+     */
+    @GetMapping("/api/v1/insights/{id}/questions/history")
+    @ResponseStatus(code = HttpStatus.OK)
+    public ResponseDTO<?> previousQuestions(@PathVariable("id") long insightId,
+                                        @AuthenticationPrincipal UserDetails userDetails) {
+        TotalArchivedQuestionResponse totalArchivedQuestionResponse = questionService.findPreviousQuestion(insightId, userDetails.getUsername());
+        return ResponseDTO.of(totalArchivedQuestionResponse, "success");
     }
 
 }
