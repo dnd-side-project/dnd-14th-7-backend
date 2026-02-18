@@ -2,6 +2,7 @@ package com.dnd.ahaive.domain.auth.service;
 
 import com.dnd.ahaive.domain.auth.dto.response.TokenResponse;
 import com.dnd.ahaive.domain.auth.entity.Auth;
+import com.dnd.ahaive.domain.auth.exception.RefreshTokenInvalid;
 import com.dnd.ahaive.domain.auth.repository.AuthRepository;
 import com.dnd.ahaive.domain.user.entity.User;
 import com.dnd.ahaive.domain.user.repository.UserRepository;
@@ -35,6 +36,19 @@ public class AuthService {
               return new UserNotFoundException(ErrorCode.USER_NOT_FOUND);
             }
         );
+
+    // 리프레시 토큰이 DB에 존재하는지, 일치하는지 확인
+    Auth auth = authRepository.findByUserUuid(userUuid)
+        .orElseThrow(
+            () -> {
+              log.error("리프레시 토큰이 DB에 존재하지 않습니다. userUuid: {}", userUuid);
+              return new RefreshTokenInvalid(ErrorCode.REFRESH_TOKEN_INVALID);
+            }
+        );
+    if(!auth.getRefreshToken().equals(token)){
+      log.error("리프레시 토큰이 DB에 저장된 토큰과 일치하지 않습니다. userUuid: {}", userUuid);
+      throw new RefreshTokenInvalid(ErrorCode.REFRESH_TOKEN_INVALID);
+    }
 
     // auth 테이블에서 리프레시 토큰 제거
     authRepository.deleteByUserUuid(userUuid);
