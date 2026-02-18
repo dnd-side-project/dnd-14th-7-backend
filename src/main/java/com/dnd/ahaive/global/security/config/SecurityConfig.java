@@ -39,7 +39,7 @@ public class SecurityConfig {
 
     // 인증 실패 시 반환할 JSON 응답
     String invalidAuthenticationResponse = objectMapper
-        .writeValueAsString(ResponseDTO.of(ErrorCode.ACCESS_DENIED));
+        .writeValueAsString(ResponseDTO.of(ErrorCode.UNAUTHORIZED));
 
     // 인가 실패 시 반환할 JSON 응답
     String invalidAuthorizationResponse = objectMapper
@@ -63,7 +63,7 @@ public class SecurityConfig {
             //인증 실패 시 응답 핸들링
             .authenticationEntryPoint(((request, response, authException) -> {
               response.setContentType("application/json;charset=UTF-8");
-              response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+              response.setStatus(HttpStatus.UNAUTHORIZED.value());
               response.setContentType("application/json");
               response.getWriter().write(invalidAuthenticationResponse);
             }
@@ -71,7 +71,7 @@ public class SecurityConfig {
             //인가 실패 시 응답 핸들링
             .accessDeniedHandler((request, response, authException) -> {
               response.setContentType("application/json;charset=UTF-8");
-              response.setStatus(HttpStatus.UNAUTHORIZED.value());
+              response.setStatus(HttpStatus.FORBIDDEN.value());
               response.setContentType("application/json");
               response.getWriter().write(invalidAuthorizationResponse);
             }))
