@@ -36,7 +36,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         String accessToken = (String) attributes.get("accessToken");
         String refreshToken = (String) attributes.get("refreshToken");
 
-        response.sendRedirect("http://localhost:3000?accessToken=" + accessToken + "&refreshToken=" + refreshToken);
+        response.sendRedirect("https://ahaive.vercel.app/login-success?accessToken=" + accessToken + "&refreshToken=" + refreshToken);
 
 
     }
