@@ -1,5 +1,6 @@
 package com.dnd.ahaive.domain.user.entity;
 
+import com.dnd.ahaive.domain.insight.entity.Insight;
 import com.dnd.ahaive.global.common.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -8,7 +9,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -46,6 +50,9 @@ public class User extends BaseEntity {
   private Provider provider;
 
   private String providerId;
+
+  @OneToMany(mappedBy = "user")
+  private List<Insight> insights = new ArrayList<>();
 
   @Builder
   private User(
@@ -86,6 +93,11 @@ public class User extends BaseEntity {
         .provider(provider)
         .providerId(providerId)
         .build();
+  }
+
+  public void addInsight(Insight insight) {
+    insights.add(insight);
+    insight.changeUser(this);
   }
 
 
