@@ -51,7 +51,7 @@ public class AuthService {
     }
 
     // auth 테이블에서 리프레시 토큰 제거
-    authRepository.deleteByUserUuid(userUuid);
+    authRepository.delete(auth);
     authRepository.flush();
 
     // 새로운 엑세스 토큰, 리프레시 토큰 발급
