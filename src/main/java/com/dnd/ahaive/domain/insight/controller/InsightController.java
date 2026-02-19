@@ -7,6 +7,7 @@ import com.dnd.ahaive.global.common.response.ResponseDTO;
 import com.dnd.ahaive.global.security.core.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +20,7 @@ public class InsightController {
 
   private final InsightService insightService;
 
+  @PostMapping
   public ResponseDTO<InsightCreateResponse> createInsight(@RequestBody InsightCreateRequest insightCreateRequest,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
 
