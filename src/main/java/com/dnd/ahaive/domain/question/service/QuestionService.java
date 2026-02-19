@@ -66,4 +66,24 @@ public class QuestionService {
 
         return TotalArchivedQuestionResponse.from(responses);
     }
+
+    @Transactional
+    public void rollbackPreviousQuestion(long insightId, long questionId, String username) {
+        Insight insight = insightRepository.findByIdWithUser(insightId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 인사이트를 찾을 수 없습니다. insightId : " + insightId));
+
+        if (insight.isNotWrittenBy(username)) {
+            throw new InsightAccessDeniedException(
+                    "해당 인사이트에 대한 접근 권한이 없습니다. insightId : " + insightId + ", username : " + username);
+        }
+
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 질문을 찾을 수 없습니다. questionsId : " + questionId));
+        if (question.isNotFrom(insight)) {
+            throw new IllegalArgumentException(
+                    "해당 인사이트에 속한 질문이 아닙니다. insightId: " + insightId + ", questionsId: " + questionId);
+        }
+
+        question.activate();
+    }
 }

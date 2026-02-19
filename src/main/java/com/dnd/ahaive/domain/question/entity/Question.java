@@ -36,4 +36,14 @@ public class Question extends BaseEntity {
 
     private long version;
 
+    public boolean isNotFrom(Insight insight) {
+        return this.insight == insight;
+    }
+
+    public void activate() {
+        if (this.status != QuestionStatus.ARCHIVED) {
+            throw new IllegalStateException("ARCHIVED 질문만 되돌릴 수 있습니다.");
+        }
+        this.status = QuestionStatus.WAITING;
+    }
 }

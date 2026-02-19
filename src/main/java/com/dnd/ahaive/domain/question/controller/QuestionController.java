@@ -10,6 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,6 +40,15 @@ public class QuestionController {
                                         @AuthenticationPrincipal UserDetails userDetails) {
         TotalArchivedQuestionResponse totalArchivedQuestionResponse = questionService.findPreviousQuestion(insightId, userDetails.getUsername());
         return ResponseDTO.of(totalArchivedQuestionResponse, "success");
+    }
+
+    @PostMapping("/api/v1/insights/{id}/questions/{questionId}/rollback")
+    @ResponseStatus(code = HttpStatus.OK)
+    public ResponseDTO<?> rollback(@PathVariable("id") long insightId,
+                                   @PathVariable("questionId") long questionId,
+                                   @AuthenticationPrincipal UserDetails userDetails) {
+        questionService.rollbackPreviousQuestion(insightId, questionId, userDetails.getUsername());
+        return ResponseDTO.of("success");
     }
 
 }
