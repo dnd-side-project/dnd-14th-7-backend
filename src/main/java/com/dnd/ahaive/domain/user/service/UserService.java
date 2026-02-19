@@ -9,6 +9,7 @@ import com.dnd.ahaive.global.security.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -25,11 +26,12 @@ public class UserService {
     return UserResponse.from(user);
   }
 
+  @Transactional
   public void updateUserPosition(String uuid, Position position) {
     User user = userRepository.findByUserUuid(uuid).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND)
     );
 
-
+    user.updatePosition(position);
   }
 }
