@@ -20,7 +20,7 @@ public class AnswerService {
     private final AnswerRepository answerRepository;
 
     @Transactional
-    public void register(long questionId, AnswerRequestDto answerRequestDto, String username) {
+    public Long register(long questionId, AnswerRequestDto answerRequestDto, String username) {
         // 질문 조회
         Question question = questionRepository.findByIdWithInsightAndUser(questionId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 질문을 찾을 수 없습니다. questionId : " + questionId));
@@ -38,9 +38,11 @@ public class AnswerService {
         }
 
         Answer answer = Answer.of(question, answerRequestDto.content(), false);
-        answerRepository.save(answer);
+        Answer savedAnswer = answerRepository.save(answer);
 
         question.complete();
+
+        return savedAnswer.getId();
     }
 
 
