@@ -7,6 +7,7 @@ import com.dnd.ahaive.domain.auth.exception.TokenInvalidType;
 import com.dnd.ahaive.domain.auth.exception.TokenNotFound;
 import com.dnd.ahaive.global.common.response.ResponseDTO;
 import com.dnd.ahaive.global.security.exception.UserNotFoundException;
+import com.dnd.ahaive.infra.claude.exception.AiCallException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,6 +56,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     log.error("사용자를 찾을 수 없습니다.", e);
     return ResponseEntity
         .status(HttpStatus.NOT_FOUND)
+        .body(ResponseDTO.of(e.getErrorCode()));
+  }
+
+  @ExceptionHandler(AiCallException.class)
+  public ResponseEntity<ResponseDTO> handleAiCallException(AiCallException e) {
+    log.error("AI 호출 중 예외가 발생했습니다.", e);
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .body(ResponseDTO.of(e.getErrorCode()));
   }
 
