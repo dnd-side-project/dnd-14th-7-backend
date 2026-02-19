@@ -1,6 +1,7 @@
 package com.dnd.ahaive.domain.insight.entity;
 
 import com.dnd.ahaive.domain.user.entity.User;
+import com.dnd.ahaive.global.common.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -16,53 +17,53 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Insight {
+public class Insight extends BaseEntity {
 
-  @Id @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-  private Long id;
+    @Id @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
+    private Long id;
 
-  private String initThought;
-  private String title;
+    private String initThought;
+    private String title;
 
-  private int view;
+    private int view;
 
-  private boolean trash;
+    private boolean trash;
 
-  private LocalDateTime trashedAt;
+    private LocalDateTime trashedAt;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
-  private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-  public void changeUser(User user) {
-    this.user = user;
-  }
+    public void changeUser(User user) {
+        this.user = user;
+    }
 
-  @Builder
-  private Insight(String initThought, String title, User user) {
-    this.initThought = initThought;
-    this.title = title;
-    this.user = user;
-    this.view = 0;
-    this.trash = false;
-    this.trashedAt = null;
-  }
+    @Builder
+    private Insight(String initThought, String title, User user) {
+        this.initThought = initThought;
+        this.title = title;
+        this.user = user;
+        this.view = 0;
+        this.trash = false;
+        this.trashedAt = null;
+    }
 
-  public void moveToTrash() {
-    this.trash = true;
-    this.trashedAt = LocalDateTime.now();
-  }
+    public void moveToTrash() {
+        this.trash = true;
+        this.trashedAt = LocalDateTime.now();
+    }
 
-  public void increaseView() {
-    this.view++;
-  }
+    public void increaseView() {
+        this.view++;
+    }
 
-  public static Insight from(String initThought, String title, User user) {
-    return Insight.builder()
-        .initThought(initThought)
-        .title(title)
-        .user(user)
-        .build();
-  }
+    public static Insight from(String initThought, String title, User user) {
+        return Insight.builder()
+                .initThought(initThought)
+                .title(title)
+                .user(user)
+                .build();
+    }
 
 }
