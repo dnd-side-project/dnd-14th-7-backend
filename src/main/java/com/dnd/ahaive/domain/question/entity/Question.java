@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -36,8 +37,25 @@ public class Question extends BaseEntity {
 
     private long version;
 
+    @Builder
+    private Question(Insight insight, String content, QuestionStatus status, long version) {
+        this.insight = insight;
+        this.content = content;
+        this.status = status;
+        this.version = version;
+    }
+
+    public static Question of(Insight insight, String content, QuestionStatus status, long version) {
+        return Question.builder()
+                .insight(insight)
+                .content(content)
+                .status(status)
+                .version(version)
+                .build();
+    }
+
     public boolean isNotFrom(Insight insight) {
-        return this.insight == insight;
+        return this.insight != insight;
     }
 
     public void activate() {

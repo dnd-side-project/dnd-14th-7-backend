@@ -1,6 +1,7 @@
 package com.dnd.ahaive.domain.user.entity;
 
 import com.dnd.ahaive.global.common.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -21,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Table(
     name = "users",
     indexes = {
-        @Index(name = "idx_user_uuid", columnList = "userUuid", unique = true),
+        @Index(name = "idx_user_uuid", columnList = "userUuid"),
         @Index(name = "idx_provider_id", columnList = "providerId", unique = true)
     }
 
@@ -31,6 +32,7 @@ public class User extends BaseEntity {
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(unique = true)
   private String userUuid;
 
   @Enumerated(EnumType.STRING)
