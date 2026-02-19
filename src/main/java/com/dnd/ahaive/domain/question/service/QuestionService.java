@@ -1,8 +1,7 @@
 package com.dnd.ahaive.domain.question.service;
 
 import com.dnd.ahaive.domain.insight.entity.Insight;
-import com.dnd.ahaive.domain.insight.exception.InsightAccessDeniedException;
-import com.dnd.ahaive.domain.insight.repository.InsightRepository;
+import com.dnd.ahaive.domain.insight.service.InsightService;
 import com.dnd.ahaive.domain.question.controller.dto.AnswerResponse;
 import com.dnd.ahaive.domain.question.controller.dto.TotalArchivedQuestionResponse;
 import com.dnd.ahaive.domain.question.controller.dto.QuestionResponse;
@@ -22,19 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class QuestionService {
 
-    private final InsightRepository insightRepository;
+    private final InsightService insightService;
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
 
     @Transactional(readOnly = true)
     public TotalQuestionDto findQuestionAndAnswers(long insightId, String username) {
-        Insight insight = insightRepository.findByIdWithUser(insightId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 인사이트를 찾을 수 없습니다. insightId : " + insightId));
-
-        if (insight.isNotWrittenBy(username)) {
-            throw new InsightAccessDeniedException(
-                    "해당 인사이트에 대한 접근 권한이 없습니다. insightId : " + insightId + ", username : " + username);
-        }
+        insightService.getValidatedInsight(insightId, username);
 
         List<Question> waitingQuestions = questionRepository.findAllByInsightIdAndStatusOrderByCreatedAtDesc(insightId,
                 QuestionStatus.WAITING);
@@ -51,13 +44,7 @@ public class QuestionService {
 
     @Transactional(readOnly = true)
     public TotalArchivedQuestionResponse findPreviousQuestion(long insightId, String username) {
-        Insight insight = insightRepository.findByIdWithUser(insightId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 인사이트를 찾을 수 없습니다. insightId : " + insightId));
-
-        if (insight.isNotWrittenBy(username)) {
-            throw new InsightAccessDeniedException(
-                    "해당 인사이트에 대한 접근 권한이 없습니다. insightId : " + insightId + ", username : " + username);
-        }
+        insightService.getValidatedInsight(insightId, username);
 
         List<Question> archivedQuestions = questionRepository.findAllByInsightIdAndStatusOrderByCreatedAtDesc(insightId,
                 QuestionStatus.ARCHIVED);
@@ -69,13 +56,7 @@ public class QuestionService {
 
     @Transactional
     public void rollbackPreviousQuestion(long insightId, long questionId, String username) {
-        Insight insight = insightRepository.findByIdWithUser(insightId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 인사이트를 찾을 수 없습니다. insightId : " + insightId));
-
-        if (insight.isNotWrittenBy(username)) {
-            throw new InsightAccessDeniedException(
-                    "해당 인사이트에 대한 접근 권한이 없습니다. insightId : " + insightId + ", username : " + username);
-        }
+        Insight insight = insightService.getValidatedInsight(insightId, username);
 
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 질문을 찾을 수 없습니다. questionsId : " + questionId));
