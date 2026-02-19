@@ -64,4 +64,12 @@ public class Question extends BaseEntity {
         }
         this.status = QuestionStatus.WAITING;
     }
+
+    public void complete() {
+        this.status = QuestionStatus.COMPLETED;
+    }
+
+    public boolean isCompleted() {
+        return this.status == QuestionStatus.COMPLETED;
+    }
 }
