@@ -95,6 +95,10 @@ public class User extends BaseEntity {
         .build();
   }
 
+  public void updatePosition(Position position) {
+    this.position = position;
+  }
+
 
 
 }

@@ -1,6 +1,7 @@
 package com.dnd.ahaive.domain.user.service;
 
 import com.dnd.ahaive.domain.user.dto.response.UserResponse;
+import com.dnd.ahaive.domain.user.entity.Position;
 import com.dnd.ahaive.domain.user.entity.User;
 import com.dnd.ahaive.domain.user.repository.UserRepository;
 import com.dnd.ahaive.global.exception.ErrorCode;
@@ -22,5 +23,13 @@ public class UserService {
     );
 
     return UserResponse.from(user);
+  }
+
+  public void updateUserPosition(String uuid, Position position) {
+    User user = userRepository.findByUserUuid(uuid).orElseThrow(
+        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND)
+    );
+
+
   }
 }
