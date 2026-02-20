@@ -40,7 +40,7 @@ public class QuestionController {
     @ResponseStatus(code = HttpStatus.OK)
     public ResponseDTO<?> previousQuestions(@PathVariable("id") long insightId,
                                         @AuthenticationPrincipal CustomUserDetails userDetails) {
-        TotalArchivedQuestionResponse totalArchivedQuestionResponse = questionService.findPreviousQuestion(insightId, userDetails.getUsername());
+        TotalArchivedQuestionResponse totalArchivedQuestionResponse = questionService.findPreviousQuestion(insightId, userDetails.getUuid());
         return ResponseDTO.of(totalArchivedQuestionResponse, "success");
     }
 
