@@ -7,6 +7,7 @@ import com.dnd.ahaive.domain.insight.entity.InsightGenerationType;
 import com.dnd.ahaive.domain.insight.entity.InsightPiece;
 import com.dnd.ahaive.domain.insight.repository.InsightPieceRepository;
 import com.dnd.ahaive.domain.insight.repository.InsightRepository;
+import com.dnd.ahaive.domain.tag.dto.response.AiTagResponse;
 import com.dnd.ahaive.domain.user.entity.User;
 import com.dnd.ahaive.domain.user.repository.UserRepository;
 import com.dnd.ahaive.global.exception.ErrorCode;
@@ -16,6 +17,7 @@ import com.dnd.ahaive.infra.claude.prompt.ClaudeAiPrompt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Service
@@ -27,6 +29,7 @@ public class InsightService {
   private final InsightPieceRepository insightPieceRepository;
 
   private final ClaudeAiClient claudeAiClient;
+  private final ObjectMapper objectMapper;
 
   public InsightCreateResponse createInsight(InsightCreateRequest insightCreateRequest, String uuid) {
     User user = userRepository.findByUserUuid(uuid).orElseThrow(
@@ -42,6 +45,8 @@ public class InsightService {
     String insightPieceContent = claudeAiClient.sendMessage(ClaudeAiPrompt.INIT_THOUGHT_TO_INSIGHT_PROMPT(initThought));
 
     // 태그 생성
+    String response = claudeAiClient.sendMessage(ClaudeAiPrompt.INIT_THOUGHT_TO_TAG_PROMPT(initThought));
+    AiTagResponse aiTagResponse = objectMapper.readValue(response, AiTagResponse.class);
 
     // 질문 3개 생성
 
