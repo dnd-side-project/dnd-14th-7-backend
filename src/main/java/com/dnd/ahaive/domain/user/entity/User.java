@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
     name = "users",
     indexes = {
         @Index(name = "idx_user_uuid", columnList = "userUuid"),
-        @Index(name = "idx_provider_id", columnList = "providerId", unique = true)
+        @Index(name = "idx_provider_id", columnList = "providerId")
     }
 
 )
@@ -50,6 +50,7 @@ public class User extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private Position position;
 
+  @Column(unique = true)
   private String providerId;
 
   @Builder
