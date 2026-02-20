@@ -88,6 +88,12 @@ public class InsightService {
     return InsightCreateResponse.from(insight);
   }
 
+  /**
+   * 사용자가 작성한 메모를(첫 생각) 기반으로 AI가 생성한 질문들을 반환합니다.
+   * 질문 재생성 API 에서 사용.
+   * @param initThought 첫 생각
+   * @return AI가 생성한 질문들을 담은 AiQuestionResponse 객체
+   */
   public AiQuestionResponse generateQuestions(String initThought) {
     String questionResponse = claudeAiClient.sendMessage(ClaudeAiPrompt.INIT_THOUGHT_TO_QUESTION_PROMPT(initThought));
     return objectMapper.readValue(questionResponse, AiQuestionResponse.class);
