@@ -45,3 +45,6 @@ spring:
 springdoc:
   swagger-ui:
     url: /v3/api-docs
+
+server:
+  forward-headers-strategy: framework
