@@ -8,15 +8,19 @@ import com.dnd.ahaive.domain.insight.entity.InsightPiece;
 import com.dnd.ahaive.domain.insight.repository.InsightPieceRepository;
 import com.dnd.ahaive.domain.insight.repository.InsightRepository;
 import com.dnd.ahaive.domain.tag.dto.response.AiTagResponse;
+import com.dnd.ahaive.domain.tag.entity.Tag;
+import com.dnd.ahaive.domain.tag.repository.TagRepository;
 import com.dnd.ahaive.domain.user.entity.User;
 import com.dnd.ahaive.domain.user.repository.UserRepository;
 import com.dnd.ahaive.global.exception.ErrorCode;
 import com.dnd.ahaive.global.security.exception.UserNotFoundException;
 import com.dnd.ahaive.infra.claude.ClaudeAiClient;
 import com.dnd.ahaive.infra.claude.prompt.ClaudeAiPrompt;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
@@ -30,7 +34,9 @@ public class InsightService {
 
   private final ClaudeAiClient claudeAiClient;
   private final ObjectMapper objectMapper;
+  private final TagRepository tagRepository;
 
+  @Transactional
   public InsightCreateResponse createInsight(InsightCreateRequest insightCreateRequest, String uuid) {
     User user = userRepository.findByUserUuid(uuid).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND)
@@ -62,6 +68,11 @@ public class InsightService {
     );
     insightPieceRepository.save(insightPiece);
 
+    // 태그 저장
+    List<Tag> tags = aiTagResponse.getTags().stream()
+        .map(tagName -> Tag.of(user, insight, tagName))
+        .toList();
+    tagRepository.saveAll(tags);
 
 
     return InsightCreateResponse.from(insight);
