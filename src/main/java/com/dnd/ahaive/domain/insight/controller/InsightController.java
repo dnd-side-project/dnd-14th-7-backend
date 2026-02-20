@@ -24,7 +24,7 @@ public class InsightController {
   public ResponseDTO<InsightCreateResponse> createInsight(@RequestBody InsightCreateRequest insightCreateRequest,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-    InsightCreateResponse insightCreateResponse = insightService.createInsight(insightCreateRequest, userDetails.getUuid());
+    InsightCreateResponse insightCreateResponse = insightService.createInsightParallel(insightCreateRequest, userDetails.getUuid());
 
     return ResponseDTO.of(insightCreateResponse, "인사이트 생성에 성공하였습니다.");
   }
