@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -32,4 +33,21 @@ public class InsightPiece extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private InsightGenerationType createdType;
+
+    @Builder
+    private InsightPiece(Insight insight, String content, InsightGenerationType createdType) {
+        this.insight = insight;
+        this.content = content;
+        this.createdType = createdType;
+    }
+
+    public static InsightPiece of(Insight insight, String content, InsightGenerationType createdType) {
+        return InsightPiece.builder()
+            .insight(insight)
+            .content(content)
+            .createdType(createdType)
+            .build();
+    }
+
+
 }

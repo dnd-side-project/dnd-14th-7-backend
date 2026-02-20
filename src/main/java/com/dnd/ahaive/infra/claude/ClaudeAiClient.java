@@ -16,7 +16,7 @@ public class ClaudeAiClient {
   public String sendMessage(String prompt) {
     try {
       String aiResponse = chatModel.call(prompt);
-      return aiResponse;
+      return aiResponse.replaceAll("```json|```", "").trim();
     } catch (Exception e) {
       log.error(e.getMessage(), e);
       throw new AiCallException(ErrorCode.INTERNAL_SERVER_ERROR);

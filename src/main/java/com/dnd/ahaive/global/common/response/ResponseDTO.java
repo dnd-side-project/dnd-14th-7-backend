@@ -73,4 +73,14 @@ public class ResponseDTO<T> {
         .build();
   }
 
+  public static <T> ResponseDTO<T> created(T data, String message) {
+    return ResponseDTO.<T>builder()
+        .localDateTime(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+        .statusCode("CREATED")
+        .responseCode(201)
+        .message(message)
+        .data(data)
+        .build();
+  }
+
 }

@@ -95,8 +95,8 @@ public enum ErrorCode {
     // 500 Internal Server Error
     INTERNAL_SERVER_ERROR(500, "INTERNAL_SERVER_ERROR", "서버 내부 오류가 발생했습니다."),
     VECTOR_EMBEDDING_API_FAILED(500, "VECTOR_EMBEDDING_API_FAILED", "벡터 임베딩 API 호출에 실패했습니다."),
-    UNKNOWN_ERROR(500, "UNKNOWN_ERROR", "예기치 못한 오류가 발생했습니다.");
-
+    UNKNOWN_ERROR(500, "UNKNOWN_ERROR", "예기치 못한 오류가 발생했습니다."),
+    AI_RESPONSE_PARSE_ERROR(500, "AI_RESPONSE_PARSE_ERROR", "AI 응답 파싱에 실패했습니다.");
 
 
     private final Integer customStatusCode;
