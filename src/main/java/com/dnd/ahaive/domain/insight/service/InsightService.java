@@ -55,9 +55,10 @@ public class InsightService {
     String tagResponse = claudeAiClient.sendMessage(ClaudeAiPrompt.INIT_THOUGHT_TO_TAG_PROMPT(initThought));
     AiTagResponse aiTagResponse = objectMapper.readValue(tagResponse, AiTagResponse.class);
 
+    //=========================================
+
     // 질문 생성
-    String questionResponse = claudeAiClient.sendMessage(ClaudeAiPrompt.INIT_THOUGHT_TO_QUESTION_PROMPT(initThought));
-    AiQuestionResponse aiQuestionResponse = objectMapper.readValue(questionResponse, AiQuestionResponse.class);
+    AiQuestionResponse aiQuestionResponse = generateQuestions(initThought);
 
     // 인사이트 저장
     Insight insight = Insight.from(initThought, title, user);
@@ -79,6 +80,11 @@ public class InsightService {
 
 
     return InsightCreateResponse.from(insight);
+  }
+
+  public AiQuestionResponse generateQuestions(String initThought) {
+    String questionResponse = claudeAiClient.sendMessage(ClaudeAiPrompt.INIT_THOUGHT_TO_QUESTION_PROMPT(memo));
+    return objectMapper.readValue(questionResponse, AiQuestionResponse.class);
   }
 
 
