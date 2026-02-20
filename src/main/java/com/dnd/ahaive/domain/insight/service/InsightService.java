@@ -8,6 +8,9 @@ import com.dnd.ahaive.domain.insight.entity.InsightPiece;
 import com.dnd.ahaive.domain.insight.repository.InsightPieceRepository;
 import com.dnd.ahaive.domain.insight.repository.InsightRepository;
 import com.dnd.ahaive.domain.question.dto.response.AiQuestionResponse;
+import com.dnd.ahaive.domain.question.entity.Question;
+import com.dnd.ahaive.domain.question.entity.QuestionStatus;
+import com.dnd.ahaive.domain.question.repository.QuestionRepository;
 import com.dnd.ahaive.domain.tag.dto.response.AiTagResponse;
 import com.dnd.ahaive.domain.tag.entity.Tag;
 import com.dnd.ahaive.domain.tag.repository.TagRepository;
@@ -32,7 +35,7 @@ public class InsightService {
   private final UserRepository userRepository;
   private final InsightRepository insightRepository;
   private final InsightPieceRepository insightPieceRepository;
-  private final Question
+  private final QuestionRepository questionRepository;
 
   private final ClaudeAiClient claudeAiClient;
   private final ObjectMapper objectMapper;
@@ -80,18 +83,17 @@ public class InsightService {
     tagRepository.saveAll(tags);
 
     // 질문 저장
-
-
+    List<Question> questions = aiQuestionResponse.getQuestions().stream()
+        .map(questionContent -> Question.of(insight, questionContent, QuestionStatus.WAITING, 1L))
+        .toList();
+    questionRepository.saveAll(questions);
 
     return InsightCreateResponse.from(insight);
   }
 
   public AiQuestionResponse generateQuestions(String initThought) {
-    String questionResponse = claudeAiClient.sendMessage(ClaudeAiPrompt.INIT_THOUGHT_TO_QUESTION_PROMPT(memo));
+    String questionResponse = claudeAiClient.sendMessage(ClaudeAiPrompt.INIT_THOUGHT_TO_QUESTION_PROMPT(initThought));
     return objectMapper.readValue(questionResponse, AiQuestionResponse.class);
   }
-
-
-
 
 }
