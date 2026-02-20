@@ -45,6 +45,9 @@ public class User extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private Provider provider;
 
+  @Enumerated(EnumType.STRING)
+  private Position position;
+
   private String providerId;
 
   @Builder
@@ -55,6 +58,7 @@ public class User extends BaseEntity {
       int credit,
       String email,
       Provider provider,
+      Position position,
       String providerId) {
     this.userUuid = userUuid;
     this.role = role;
@@ -62,6 +66,7 @@ public class User extends BaseEntity {
     this.credit = credit;
     this.email = email;
     this.provider = provider;
+    this.position = position;
     this.providerId = providerId;
   }
 
@@ -71,6 +76,7 @@ public class User extends BaseEntity {
         .role(Role.GUEST)
         .nickname("Guest")
         .credit(credit)
+        .position(Position.NONE)
         .provider(null)
         .providerId(null)
         .build();
@@ -82,10 +88,15 @@ public class User extends BaseEntity {
         .role(Role.MEMBER)
         .nickname(nickname)
         .credit(credit)
+        .position(Position.NONE)
         .email(email)
         .provider(provider)
         .providerId(providerId)
         .build();
+  }
+
+  public void updatePosition(Position position) {
+    this.position = position;
   }
 
 
