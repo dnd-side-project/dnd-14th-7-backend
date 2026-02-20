@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @Component
@@ -33,11 +34,19 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
+
         String accessToken = (String) attributes.get("accessToken");
         String refreshToken = (String) attributes.get("refreshToken");
 
-        response.sendRedirect("https://ahaive.vercel.app/login-success?accessToken=" + accessToken + "&refreshToken=" + refreshToken);
+        String redirectUri = (String) request.getSession().getAttribute("redirectUri");
+        request.getSession().removeAttribute("redirectUri");
 
+        //TODO: 리다이렉트 URI 검증 로직 추가해야함
 
+        if(!StringUtils.hasText(redirectUri)){
+            redirectUri = "https://ahaive.vercel.app";
+        }
+
+        response.sendRedirect(redirectUri + "/login-success?accessToken=" + accessToken + "&refreshToken=" + refreshToken);
     }
 }

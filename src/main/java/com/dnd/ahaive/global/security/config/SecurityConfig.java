@@ -2,6 +2,7 @@ package com.dnd.ahaive.global.security.config;
 
 import com.dnd.ahaive.global.common.response.ResponseDTO;
 import com.dnd.ahaive.global.exception.ErrorCode;
+import com.dnd.ahaive.global.oauth2.CustomOAuth2AuthorizationRequestResolver;
 import com.dnd.ahaive.global.oauth2.OAuth2LoginSuccessHandler;
 import com.dnd.ahaive.global.oauth2.OAuth2UserService;
 import com.dnd.ahaive.global.security.jwt.JwtTokenFilter;
@@ -27,6 +28,7 @@ public class SecurityConfig {
    */
   private final ObjectMapper objectMapper;
   private final OAuth2UserService OAuth2UserService;
+  private final CustomOAuth2AuthorizationRequestResolver customOAuth2AuthorizationRequestResolver;
 
   @Bean
   public BCryptPasswordEncoder passwordEncoder() {
@@ -80,6 +82,7 @@ public class SecurityConfig {
         .oauth2Login(oauth2 -> oauth2
             .authorizationEndpoint(authorization -> authorization
                 .baseUri("/oauth2/authorization")
+                .authorizationRequestResolver(customOAuth2AuthorizationRequestResolver)
             )
             .redirectionEndpoint(redirection -> redirection
                 .baseUri("/login/oauth2/code/*"))
