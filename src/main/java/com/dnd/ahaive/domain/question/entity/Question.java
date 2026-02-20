@@ -47,11 +47,11 @@ public class Question extends BaseEntity {
 
     public static Question of(Insight insight, String content, QuestionStatus status, long version) {
         return Question.builder()
-                .insight(insight)
-                .content(content)
-                .status(status)
-                .version(version)
-                .build();
+            .insight(insight)
+            .content(content)
+            .status(status)
+            .version(version)
+            .build();
     }
 
     public boolean isNotFrom(Insight insight) {

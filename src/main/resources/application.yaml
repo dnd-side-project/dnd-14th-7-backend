@@ -2,8 +2,8 @@ spring:
   application:
     name: ahaive
 
-  profiles:
-    active: dev
+#  profiles:
+#    active: dev
 
 logging:
   pattern:

@@ -9,6 +9,7 @@ import com.dnd.ahaive.global.common.response.ResponseDTO;
 import com.dnd.ahaive.global.security.exception.UserNotFoundException;
 import com.dnd.ahaive.infra.claude.exception.AiCallException;
 import jakarta.persistence.EntityNotFoundException;
+import com.dnd.ahaive.infra.claude.exception.AiResponseParseException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -90,6 +91,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .body(ResponseDTO.of(e.getMessage()));
+  }
+
+  @ExceptionHandler(AiResponseParseException.class)
+  public ResponseEntity<ResponseDTO> handleAiResponseParseException(AiResponseParseException e) {
+    log.error("AI 응답 파싱에 실패했습니다.", e);
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(ResponseDTO.of(e.getErrorCode()));
   }
 
   @ExceptionHandler(Exception.class)
