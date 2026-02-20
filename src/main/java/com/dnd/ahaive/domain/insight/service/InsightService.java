@@ -40,6 +40,8 @@ public class InsightService {
 
     insightRepository.save(insight);
 
+
+
     return InsightCreateResponse.from(insight);
   }
 }
