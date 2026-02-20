@@ -20,13 +20,13 @@ import com.dnd.ahaive.global.exception.ErrorCode;
 import com.dnd.ahaive.global.security.exception.UserNotFoundException;
 import com.dnd.ahaive.infra.claude.ClaudeAiClient;
 import com.dnd.ahaive.infra.claude.prompt.ClaudeAiPrompt;
-import java.util.List;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Service
@@ -43,7 +43,7 @@ public class InsightService {
   private final TagRepository tagRepository;
 
   @Transactional
-  public InsightCreateResponse createInsightParallel(InsightCreateRequest insightCreateRequest, String uuid) {
+  public InsightCreateResponse createInsight(InsightCreateRequest insightCreateRequest, String uuid) {
     User user = userRepository.findByUserUuid(uuid).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND)
     );
@@ -67,8 +67,15 @@ public class InsightService {
 
     String title = titleFuture.join();
     String insightPieceContent = insightPieceFuture.join();
-    AiTagResponse aiTagResponse = objectMapper.readValue(tagFuture.join(), AiTagResponse.class);
-    AiQuestionResponse aiQuestionResponse = objectMapper.readValue(questionFuture.join(), AiQuestionResponse.class);
+    AiTagResponse aiTagResponse;
+    AiQuestionResponse aiQuestionResponse;
+
+    try {
+      aiTagResponse = objectMapper.readValue(tagFuture.join(), AiTagResponse.class);
+      aiQuestionResponse = objectMapper.readValue(questionFuture.join(), AiQuestionResponse.class);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
 
     // 인사이트 저장
     Insight insight = Insight.from(initThought, title, user);
@@ -94,7 +101,7 @@ public class InsightService {
    * @param initThought 첫 생각
    * @return AI가 생성한 질문들을 담은 AiQuestionResponse 객체
    */
-  public AiQuestionResponse generateQuestions(String initThought) {
+  public AiQuestionResponse generateQuestions(String initThought) throws JsonProcessingException {
     String questionResponse = claudeAiClient.sendMessage(ClaudeAiPrompt.INIT_THOUGHT_TO_QUESTION_PROMPT(initThought));
     return objectMapper.readValue(questionResponse, AiQuestionResponse.class);
   }
