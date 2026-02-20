@@ -6,6 +6,7 @@ import com.dnd.ahaive.domain.insight.entity.Insight;
 import com.dnd.ahaive.domain.insight.entity.InsightGenerationType;
 import com.dnd.ahaive.domain.insight.entity.InsightPiece;
 import com.dnd.ahaive.domain.insight.repository.InsightPieceRepository;
+import com.dnd.ahaive.domain.insight.exception.InsightAccessDeniedException;
 import com.dnd.ahaive.domain.insight.repository.InsightRepository;
 import com.dnd.ahaive.domain.question.dto.response.AiQuestionResponse;
 import com.dnd.ahaive.domain.question.entity.Question;
@@ -23,6 +24,7 @@ import com.dnd.ahaive.infra.claude.prompt.ClaudeAiPrompt;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.concurrent.CompletableFuture;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -106,4 +108,17 @@ public class InsightService {
     return objectMapper.readValue(questionResponse, AiQuestionResponse.class);
   }
 
+
+  @Transactional(readOnly = true)
+  public Insight getValidatedInsight(long insightId, String username) {
+    Insight insight = insightRepository.findByIdWithUser(insightId)
+            .orElseThrow(() -> new EntityNotFoundException("해당 인사이트를 찾을 수 없습니다. insightId : " + insightId));
+
+    if (insight.isNotWrittenBy(username)) {
+        throw new InsightAccessDeniedException(
+                "해당 인사이트에 대한 접근 권한이 없습니다. insightId : " + insightId + ", username : " + username);
+    }
+
+    return insight;
+  }
 }

@@ -2,6 +2,7 @@ package com.dnd.ahaive.domain.user.entity;
 
 import com.dnd.ahaive.domain.insight.entity.Insight;
 import com.dnd.ahaive.global.common.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -25,8 +26,8 @@ import lombok.NoArgsConstructor;
 @Table(
     name = "users",
     indexes = {
-        @Index(name = "idx_user_uuid", columnList = "userUuid", unique = true),
-        @Index(name = "idx_provider_id", columnList = "providerId", unique = true)
+        @Index(name = "idx_user_uuid", columnList = "userUuid"),
+        @Index(name = "idx_provider_id", columnList = "providerId")
     }
 
 )
@@ -35,6 +36,7 @@ public class User extends BaseEntity {
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(unique = true)
   private String userUuid;
 
   @Enumerated(EnumType.STRING)
@@ -52,6 +54,7 @@ public class User extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private Position position;
 
+  @Column(unique = true)
   private String providerId;
 
   @OneToMany(mappedBy = "user")
@@ -112,5 +115,7 @@ public class User extends BaseEntity {
   }
 
 
-
+  public boolean isNotSameUser(String username) {
+    return !this.userUuid.equals(username);
+  }
 }

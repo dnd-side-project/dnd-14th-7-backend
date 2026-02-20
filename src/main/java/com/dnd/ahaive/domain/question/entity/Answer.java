@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,11 +24,21 @@ public class Answer extends BaseEntity {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "questions_id")
+    @JoinColumn(name = "questions_id", unique = true)
     private Question question;
 
     private String content;
 
     private boolean isConverted;
 
+    @Builder
+    private Answer(Question question, String content, boolean isConverted) {
+        this.question = question;
+        this.content = content;
+        this.isConverted = isConverted;
+    }
+
+    public static Answer of(Question question, String content, boolean isConverted) {
+        return Answer.builder().question(question).content(content).isConverted(isConverted).build();
+    }
 }

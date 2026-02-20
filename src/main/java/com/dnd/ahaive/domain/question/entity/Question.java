@@ -54,4 +54,22 @@ public class Question extends BaseEntity {
             .build();
     }
 
+    public boolean isNotFrom(Insight insight) {
+        return this.insight != insight;
+    }
+
+    public void activate() {
+        if (this.status != QuestionStatus.ARCHIVED) {
+            throw new IllegalStateException("ARCHIVED 질문만 되돌릴 수 있습니다.");
+        }
+        this.status = QuestionStatus.WAITING;
+    }
+
+    public void complete() {
+        this.status = QuestionStatus.COMPLETED;
+    }
+
+    public boolean isCompleted() {
+        return this.status == QuestionStatus.COMPLETED;
+    }
 }

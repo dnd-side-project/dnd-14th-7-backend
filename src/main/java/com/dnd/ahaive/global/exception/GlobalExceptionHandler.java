@@ -8,6 +8,7 @@ import com.dnd.ahaive.domain.auth.exception.TokenNotFound;
 import com.dnd.ahaive.global.common.response.ResponseDTO;
 import com.dnd.ahaive.global.security.exception.UserNotFoundException;
 import com.dnd.ahaive.infra.claude.exception.AiCallException;
+import jakarta.persistence.EntityNotFoundException;
 import com.dnd.ahaive.infra.claude.exception.AiResponseParseException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -82,6 +83,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     log.warn("잘못된 요청 값: {}", e.getMessage());
     return ResponseEntity.status(ErrorCode.INVALID_INPUT_VALUE.getActualStatusCode())
         .body(ResponseDTO.of(ErrorCode.INVALID_INPUT_VALUE));
+  }
+
+  @ExceptionHandler(EntityNotFoundException.class)
+  public ResponseEntity<ResponseDTO> handleEntityNotFoundException(EntityNotFoundException e) {
+    log.error(e.getMessage());
+    return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(ResponseDTO.of(e.getMessage()));
   }
 
   @ExceptionHandler(AiResponseParseException.class)
