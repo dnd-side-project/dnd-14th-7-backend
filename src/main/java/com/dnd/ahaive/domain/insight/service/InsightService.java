@@ -32,6 +32,7 @@ public class InsightService {
   private final UserRepository userRepository;
   private final InsightRepository insightRepository;
   private final InsightPieceRepository insightPieceRepository;
+  private final Question
 
   private final ClaudeAiClient claudeAiClient;
   private final ObjectMapper objectMapper;
@@ -77,6 +78,9 @@ public class InsightService {
         .map(tagName -> Tag.of(user, insight, tagName))
         .toList();
     tagRepository.saveAll(tags);
+
+    // 질문 저장
+
 
 
     return InsightCreateResponse.from(insight);
