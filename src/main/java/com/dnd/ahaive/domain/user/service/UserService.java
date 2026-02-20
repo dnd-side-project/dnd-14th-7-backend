@@ -1,6 +1,8 @@
 package com.dnd.ahaive.domain.user.service;
 
+import com.dnd.ahaive.domain.user.dto.request.RegisterPositionRequest;
 import com.dnd.ahaive.domain.user.dto.response.UserResponse;
+import com.dnd.ahaive.domain.user.entity.Position;
 import com.dnd.ahaive.domain.user.entity.User;
 import com.dnd.ahaive.domain.user.repository.UserRepository;
 import com.dnd.ahaive.global.exception.ErrorCode;
@@ -8,6 +10,7 @@ import com.dnd.ahaive.global.security.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -22,5 +25,14 @@ public class UserService {
     );
 
     return UserResponse.from(user);
+  }
+
+  @Transactional
+  public void registerPosition(String uuid, RegisterPositionRequest registerPositionRequest) {
+    User user = userRepository.findByUserUuid(uuid).orElseThrow(
+        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND)
+    );
+
+    user.updatePosition(registerPositionRequest.getPosition());
   }
 }
