@@ -19,7 +19,7 @@ public class AnswerController {
 
     private final AnswerService answerService;
 
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/api/v1/questions/{id}/answer")
     public ResponseDTO<?> registerAnswer(@PathVariable("id") long questionId,
                                          @RequestBody AnswerRequestDto answerRequestDto,
