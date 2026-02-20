@@ -31,7 +31,9 @@ public class InsightService {
 
     String memo = insightCreateRequest.getMemo();
     String initThought = insightCreateRequest.getMemo();
+
     String title = claudeAiClient.sendMessage(ClaudeAiPrompt.MEMO_TO_TITLE_PROMPT(memo));
+    String insightPieceContent = claudeAiClient.sendMessage(ClaudeAiPrompt.MEMO_TO_INSIGHT_PROMPT(memo));
 
 
     Insight insight = Insight.from(initThought, title, user);
