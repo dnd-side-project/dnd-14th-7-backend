@@ -77,4 +77,8 @@ public class InsightService {
 
     return InsightCreateResponse.from(insight);
   }
+
+
+
+
 }
