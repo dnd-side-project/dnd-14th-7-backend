@@ -7,6 +7,7 @@ import com.dnd.ahaive.domain.insight.entity.InsightGenerationType;
 import com.dnd.ahaive.domain.insight.entity.InsightPiece;
 import com.dnd.ahaive.domain.insight.repository.InsightPieceRepository;
 import com.dnd.ahaive.domain.insight.repository.InsightRepository;
+import com.dnd.ahaive.domain.question.dto.response.AiQuestionResponse;
 import com.dnd.ahaive.domain.tag.dto.response.AiTagResponse;
 import com.dnd.ahaive.domain.tag.entity.Tag;
 import com.dnd.ahaive.domain.tag.repository.TagRepository;
@@ -51,10 +52,12 @@ public class InsightService {
     String insightPieceContent = claudeAiClient.sendMessage(ClaudeAiPrompt.INIT_THOUGHT_TO_INSIGHT_PROMPT(initThought));
 
     // 태그 생성
-    String response = claudeAiClient.sendMessage(ClaudeAiPrompt.INIT_THOUGHT_TO_TAG_PROMPT(initThought));
-    AiTagResponse aiTagResponse = objectMapper.readValue(response, AiTagResponse.class);
+    String tagResponse = claudeAiClient.sendMessage(ClaudeAiPrompt.INIT_THOUGHT_TO_TAG_PROMPT(initThought));
+    AiTagResponse aiTagResponse = objectMapper.readValue(tagResponse, AiTagResponse.class);
 
-    // 질문 3개 생성
+    // 질문 생성
+    String questionResponse = claudeAiClient.sendMessage(ClaudeAiPrompt.INIT_THOUGHT_TO_QUESTION_PROMPT(initThought));
+    AiQuestionResponse aiQuestionResponse = objectMapper.readValue(questionResponse, AiQuestionResponse.class);
 
     // 인사이트 저장
     Insight insight = Insight.from(initThought, title, user);
