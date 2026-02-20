@@ -6,6 +6,8 @@ import com.dnd.ahaive.domain.insight.service.InsightService;
 import com.dnd.ahaive.global.common.response.ResponseDTO;
 import com.dnd.ahaive.global.security.core.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,12 +23,13 @@ public class InsightController {
   private final InsightService insightService;
 
   @PostMapping
-  public ResponseDTO<InsightCreateResponse> createInsight(@RequestBody InsightCreateRequest insightCreateRequest,
+  public ResponseEntity<ResponseDTO<InsightCreateResponse>> createInsight(@RequestBody InsightCreateRequest insightCreateRequest,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
 
     InsightCreateResponse insightCreateResponse = insightService.createInsight(insightCreateRequest, userDetails.getUuid());
 
-    return ResponseDTO.of(insightCreateResponse, "인사이트 생성에 성공하였습니다.");
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(ResponseDTO.created(insightCreateResponse, "인사이트 생성에 성공하였습니다."));
   }
 
 }
