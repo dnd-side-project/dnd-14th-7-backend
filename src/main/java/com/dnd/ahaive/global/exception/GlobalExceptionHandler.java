@@ -11,6 +11,9 @@ import com.dnd.ahaive.infra.claude.exception.AiCallException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.reactive.result.method.annotation.ResponseEntityExceptionHandler;
@@ -65,6 +68,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     return ResponseEntity
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .body(ResponseDTO.of(e.getErrorCode()));
+  }
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<ResponseDTO> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
+    log.warn("입력값 검증 실패: {}", e.getBindingResult().getFieldErrors());
+    return ResponseEntity.status(ErrorCode.INVALID_INPUT_VALUE.getActualStatusCode())
+        .body(ResponseDTO.of(ErrorCode.INVALID_INPUT_VALUE));
+  }
+
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public ResponseEntity<ResponseDTO> handleHttpMessageNotReadable(HttpMessageNotReadableException e) {
+    log.warn("잘못된 요청 값: {}", e.getMessage());
+    return ResponseEntity.status(ErrorCode.INVALID_INPUT_VALUE.getActualStatusCode())
+        .body(ResponseDTO.of(ErrorCode.INVALID_INPUT_VALUE));
   }
 
   @ExceptionHandler(Exception.class)

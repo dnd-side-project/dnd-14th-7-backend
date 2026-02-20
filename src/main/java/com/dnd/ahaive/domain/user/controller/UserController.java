@@ -6,6 +6,7 @@ import com.dnd.ahaive.domain.user.entity.Position;
 import com.dnd.ahaive.domain.user.service.UserService;
 import com.dnd.ahaive.global.common.response.ResponseDTO;
 import com.dnd.ahaive.global.security.core.CustomUserDetails;
+import jakarta.validation.Valid;
 import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,7 +37,7 @@ public class UserController {
   }
 
   @PostMapping("/position")
-  public ResponseDTO<?> registerPosition(@RequestBody RegisterPositionRequest registerPositionRequest,
+  public ResponseDTO<?> registerPosition(@RequestBody @Valid RegisterPositionRequest registerPositionRequest,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
 
     userService.registerPosition(userDetails.getUuid(), registerPositionRequest);
