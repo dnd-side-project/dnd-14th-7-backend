@@ -7,6 +7,8 @@ import com.dnd.ahaive.global.security.core.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -23,6 +25,15 @@ public class TagController {
     public ResponseDTO<?> registerTag(@RequestBody TagRegisterRequestDto tagRegisterRequestDto,
                                  @AuthenticationPrincipal CustomUserDetails userDetails) {
         tagService.register(tagRegisterRequestDto, userDetails.getUuid());
+        return ResponseDTO.of("success");
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/api/v1/insights/{insightId}/tag/{tagId}")
+    public ResponseDTO<?> deleteTag(@PathVariable("insightId") long insightId,
+                                    @PathVariable("tagId") long tagId,
+                                    @AuthenticationPrincipal CustomUserDetails userDetails) {
+        tagService.delete(insightId, tagId, userDetails.getUuid());
         return ResponseDTO.of("success");
     }
 }

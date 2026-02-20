@@ -1,7 +1,10 @@
 package com.dnd.ahaive.domain.tag.service;
 
+import com.dnd.ahaive.domain.insight.entity.Insight;
+import com.dnd.ahaive.domain.insight.service.InsightService;
 import com.dnd.ahaive.domain.tag.controller.dto.TagRegisterRequestDto;
 import com.dnd.ahaive.domain.tag.entity.TagEntity;
+import com.dnd.ahaive.domain.tag.repository.InsightTagRepository;
 import com.dnd.ahaive.domain.tag.repository.TagEntityRepository;
 import com.dnd.ahaive.domain.user.entity.User;
 import com.dnd.ahaive.domain.user.repository.UserRepository;
@@ -17,6 +20,8 @@ public class TagService {
 
     private final UserRepository userRepository;
     private final TagEntityRepository tagEntityRepository;
+    private final InsightTagRepository insightTagRepository;
+    private final InsightService insightService;
 
     @Transactional
     public void register(TagRegisterRequestDto tagRegisterRequestDto, String uuid) {
@@ -35,5 +40,19 @@ public class TagService {
         tagEntityRepository.save(tagEntity);
 
         // 인사이트에 바로 추가되는 로직이 있는지 확인 필요
+    }
+
+    @Transactional
+    public void delete(long insightId, long tagId, String uuid) {
+        Insight insight = insightService.getValidatedInsight(insightId, uuid);
+        TagEntity tagEntity = tagEntityRepository.findById(tagId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 태그가 존재하지 않습니다. tagId: " + tagId));
+        User user = tagEntity.getUser();
+
+        if (user.isNotSameUser(uuid)) {
+            throw new IllegalStateException("해당 태그는 유저가 가지고 있지 않습니다. tagId : " + tagId + ", userUuid: " + uuid);
+        }
+
+        insightTagRepository.deleteByTagEntityIdAndInsightId(tagId, insightId);
     }
 }
