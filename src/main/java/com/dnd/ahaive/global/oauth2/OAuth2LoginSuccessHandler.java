@@ -41,6 +41,8 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         String redirectUri = (String) request.getSession().getAttribute("redirectUri");
         request.getSession().removeAttribute("redirectUri");
 
+        //TODO: 리다이렉트 URI 검증 로직 추가해야함
+
         if(!StringUtils.hasText(redirectUri)){
             redirectUri = "https://ahaive.vercel.app";
         }
