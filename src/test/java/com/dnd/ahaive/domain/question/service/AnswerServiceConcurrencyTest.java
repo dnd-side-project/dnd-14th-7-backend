@@ -73,7 +73,7 @@ class AnswerServiceConcurrencyTest {
 
         Long questionId = question.getId();
         AnswerRequestDto request = new AnswerRequestDto("answer");
-        String username = user.getNickname();
+        String username = user.getUserUuid();
 
         // when
         for (int i = 0; i < threadCount; i++) {

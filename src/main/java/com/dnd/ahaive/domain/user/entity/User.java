@@ -92,6 +92,6 @@ public class User extends BaseEntity {
 
 
   public boolean isNotSameUser(String username) {
-    return !this.nickname.equals(username);
+    return !this.userUuid.equals(username);
   }
 }

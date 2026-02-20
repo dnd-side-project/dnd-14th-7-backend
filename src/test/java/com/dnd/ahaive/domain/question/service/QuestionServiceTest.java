@@ -85,7 +85,7 @@ class QuestionServiceTest {
 
     @Test
     void questionIsSeparatedByStatus() {
-        TotalQuestionDto questionAndAnswers = questionService.findQuestionAndAnswers(insight.getId(), user.getNickname());
+        TotalQuestionDto questionAndAnswers = questionService.findQuestionAndAnswers(insight.getId(), user.getUserUuid());
 
         // then
         List<QuestionResponse> questions = questionAndAnswers.questions();
@@ -101,7 +101,7 @@ class QuestionServiceTest {
     @Test
     void previousQuestionIsOrderedByCreatedDate() {
         TotalArchivedQuestionResponse previousQuestion = questionService.findPreviousQuestion(insight.getId(),
-                user.getNickname());
+                user.getUserUuid());
 
         // then
         List<QuestionResponse> questionResponses = previousQuestion.archivedQuestions();
@@ -122,7 +122,7 @@ class QuestionServiceTest {
         // when & then
         Long questionId = archivedQuestions.get(0).getId();
         assertThatThrownBy(
-                () -> questionService.rollbackPreviousQuestion(secondInsight.getId(), questionId, user.getNickname()))
+                () -> questionService.rollbackPreviousQuestion(secondInsight.getId(), questionId, user.getUserUuid()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -131,7 +131,7 @@ class QuestionServiceTest {
         Long questionId = waitingQuestions.get(0).getId();
 
         assertThatThrownBy(
-                () -> questionService.rollbackPreviousQuestion(insight.getId(), questionId, user.getNickname()))
+                () -> questionService.rollbackPreviousQuestion(insight.getId(), questionId, user.getUserUuid()))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -141,7 +141,7 @@ class QuestionServiceTest {
         Long archivedQuestionId = archivedQuestions.get(0).getId();
 
         // when
-        questionService.rollbackPreviousQuestion(insight.getId(), archivedQuestionId, user.getNickname());
+        questionService.rollbackPreviousQuestion(insight.getId(), archivedQuestionId, user.getUserUuid());
 
         // then
         Question question = em.find(Question.class, archivedQuestionId);

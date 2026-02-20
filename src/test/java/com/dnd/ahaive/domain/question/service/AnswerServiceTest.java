@@ -68,7 +68,7 @@ class AnswerServiceTest {
         // given
         Long questionId = question.getId();
         AnswerRequestDto answerRequest = new AnswerRequestDto("answer");
-        String username = user.getNickname();
+        String username = user.getUserUuid();
 
         Question findQuestion = questionRepository.findById(questionId).orElseThrow();
         findQuestion.complete();
@@ -85,7 +85,7 @@ class AnswerServiceTest {
         // given
         Long questionId = question.getId();
         AnswerRequestDto answerRequest = new AnswerRequestDto("answer");
-        String username = user.getNickname();
+        String username = user.getUserUuid();
 
         Question findQuestion = questionRepository.findById(questionId).orElseThrow();
 
@@ -102,7 +102,7 @@ class AnswerServiceTest {
         // given
         Long questionId = question.getId();
         AnswerRequestDto answerRequest = new AnswerRequestDto("answer");
-        String username = user.getNickname();
+        String username = user.getUserUuid();
 
         // when
         Long savedAnswerId = answerService.register(questionId, answerRequest, username);

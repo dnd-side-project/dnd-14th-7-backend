@@ -3,6 +3,7 @@ package com.dnd.ahaive.domain.question.controller;
 import com.dnd.ahaive.domain.question.controller.dto.AnswerRequestDto;
 import com.dnd.ahaive.domain.question.service.AnswerService;
 import com.dnd.ahaive.global.common.response.ResponseDTO;
+import com.dnd.ahaive.global.security.core.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,8 +24,8 @@ public class AnswerController {
     @GetMapping("/api/v1/questions/{id}/answer")
     public ResponseDTO<?> registerAnswer(@PathVariable("id") long questionId,
                                          @RequestBody AnswerRequestDto answerRequestDto,
-                                         @AuthenticationPrincipal UserDetails userDetails) {
-        answerService.register(questionId, answerRequestDto, userDetails.getUsername());
+                                         @AuthenticationPrincipal CustomUserDetails userDetails) {
+        answerService.register(questionId, answerRequestDto, userDetails.getUuid());
         return ResponseDTO.of("success");
     }
 }

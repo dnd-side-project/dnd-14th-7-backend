@@ -4,6 +4,7 @@ import com.dnd.ahaive.domain.question.controller.dto.TotalArchivedQuestionRespon
 import com.dnd.ahaive.domain.question.controller.dto.TotalQuestionDto;
 import com.dnd.ahaive.domain.question.service.QuestionService;
 import com.dnd.ahaive.global.common.response.ResponseDTO;
+import com.dnd.ahaive.global.security.core.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,9 +26,11 @@ public class QuestionController {
      */
     @GetMapping("/api/v1/insights/{id}/questions")
     @ResponseStatus(code = HttpStatus.OK)
-    public ResponseDTO<TotalQuestionDto> questions(@PathVariable("id") long insightId, @AuthenticationPrincipal
-                                                   UserDetails userDetails) {
-        TotalQuestionDto totalQuestionDto = questionService.findQuestionAndAnswers(insightId, userDetails.getUsername());
+    public ResponseDTO<TotalQuestionDto> questions(@PathVariable("id") long insightId,
+                                                   @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        TotalQuestionDto totalQuestionDto = questionService.findQuestionAndAnswers(insightId,
+                userDetails.getUuid());
         return ResponseDTO.of(totalQuestionDto, "success");
     }
 
@@ -37,7 +40,7 @@ public class QuestionController {
     @GetMapping("/api/v1/insights/{id}/questions/history")
     @ResponseStatus(code = HttpStatus.OK)
     public ResponseDTO<?> previousQuestions(@PathVariable("id") long insightId,
-                                        @AuthenticationPrincipal UserDetails userDetails) {
+                                        @AuthenticationPrincipal CustomUserDetails userDetails) {
         TotalArchivedQuestionResponse totalArchivedQuestionResponse = questionService.findPreviousQuestion(insightId, userDetails.getUsername());
         return ResponseDTO.of(totalArchivedQuestionResponse, "success");
     }
@@ -46,8 +49,8 @@ public class QuestionController {
     @ResponseStatus(code = HttpStatus.OK)
     public ResponseDTO<?> rollback(@PathVariable("id") long insightId,
                                    @PathVariable("questionId") long questionId,
-                                   @AuthenticationPrincipal UserDetails userDetails) {
-        questionService.rollbackPreviousQuestion(insightId, questionId, userDetails.getUsername());
+                                   @AuthenticationPrincipal CustomUserDetails userDetails) {
+        questionService.rollbackPreviousQuestion(insightId, questionId, userDetails.getUuid());
         return ResponseDTO.of("success");
     }
 
