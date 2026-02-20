@@ -1,0 +1,39 @@
+package com.dnd.ahaive.domain.tag.service;
+
+import com.dnd.ahaive.domain.tag.controller.dto.TagRegisterRequestDto;
+import com.dnd.ahaive.domain.tag.entity.TagEntity;
+import com.dnd.ahaive.domain.tag.repository.TagEntityRepository;
+import com.dnd.ahaive.domain.user.entity.User;
+import com.dnd.ahaive.domain.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class TagService {
+
+    private final UserRepository userRepository;
+    private final TagEntityRepository tagEntityRepository;
+
+    @Transactional
+    public void register(TagRegisterRequestDto tagRegisterRequestDto, String uuid) {
+        User user = userRepository.findByUserUuid(uuid)
+                .orElseThrow(() -> new EntityNotFoundException("해당 회원이 존재하지 않습니다. uuid: " + uuid));
+
+        List<TagEntity> tags = tagEntityRepository.findAllByUser(user);
+        String tagName = tagRegisterRequestDto.tagName();
+
+        if (tags.stream().anyMatch(tag -> tag.containsTag(tagName))) {
+            throw new IllegalStateException("중복된 태그입니다. tagName: " + tagName);
+        }
+
+        // 없으면 추가
+        TagEntity tagEntity = TagEntity.of(user, tagName);
+        tagEntityRepository.save(tagEntity);
+
+        // 인사이트에 바로 추가되는 로직이 있는지 확인 필요
+    }
+}
