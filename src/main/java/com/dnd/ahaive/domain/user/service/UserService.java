@@ -1,5 +1,6 @@
 package com.dnd.ahaive.domain.user.service;
 
+import com.dnd.ahaive.domain.user.dto.request.RegisterPositionRequest;
 import com.dnd.ahaive.domain.user.dto.response.UserResponse;
 import com.dnd.ahaive.domain.user.entity.Position;
 import com.dnd.ahaive.domain.user.entity.User;
@@ -27,11 +28,11 @@ public class UserService {
   }
 
   @Transactional
-  public void updateUserPosition(String uuid, Position position) {
+  public void registerPosition(String uuid, RegisterPositionRequest registerPositionRequest) {
     User user = userRepository.findByUserUuid(uuid).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND)
     );
 
-    user.updatePosition(position);
+    user.updatePosition(registerPositionRequest.getPosition());
   }
 }
