@@ -31,7 +31,7 @@ public class ClaudeAiPrompt {
 
   public static String INIT_THOUGHT_TO_TAG_PROMPT(String initThought) {
     return """
-        다음 메모를 핵심 키워드 3개로 변환해줘. JSON 형식으로만 출력하고 부가 설명은 절대 포함하지 마.
+        다음 메모를 핵심 키워드 3개로 변환해줘. 마크다운 코드블록 없이 순수 JSON 형식으로만 출력하고 부가 설명은 절대 포함하지 마.
         
         예시:
         메모: 로그 안남겨서 디버깅이 너무 힘들었다
@@ -43,7 +43,7 @@ public class ClaudeAiPrompt {
 
   public static String INIT_THOUGHT_TO_QUESTION_PROMPT(String initThought) {
     return """
-        다음 메모를 바탕으로 관련된 질문 3개를 생성해줘. JSON 형식으로만 출력하고 부가 설명은 절대 포함하지 마.
+        다음 메모를 바탕으로 관련된 질문 3개를 생성해줘. 마크다운 코드블록 없이 순수 JSON 형식으로만 출력하고 부가 설명은 절대 포함하지 마.
         
         예시:
         메모: 로그 안남겨서 디버깅이 너무 힘들었다
