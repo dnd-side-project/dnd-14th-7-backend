@@ -11,8 +11,11 @@ import com.dnd.ahaive.domain.insight.repository.InsightPieceRepository;
 import com.dnd.ahaive.domain.insight.exception.InsightAccessDeniedException;
 import com.dnd.ahaive.domain.insight.repository.InsightRepository;
 import com.dnd.ahaive.domain.question.dto.response.AiQuestionResponse;
+import com.dnd.ahaive.domain.question.entity.Answer;
 import com.dnd.ahaive.domain.question.entity.Question;
 import com.dnd.ahaive.domain.question.entity.QuestionStatus;
+import com.dnd.ahaive.domain.question.exception.AnswerNotFoundException;
+import com.dnd.ahaive.domain.question.repository.AnswerRepository;
 import com.dnd.ahaive.domain.question.repository.QuestionRepository;
 import com.dnd.ahaive.domain.tag.dto.response.AiTagResponse;
 import com.dnd.ahaive.domain.tag.entity.Tag;
@@ -43,6 +46,7 @@ public class InsightService {
   private final InsightPieceRepository insightPieceRepository;
   private final QuestionRepository questionRepository;
   private final TagRepository tagRepository;
+  private final AnswerRepository answerRepository;
 
   private final ClaudeAiClient claudeAiClient;
   private final ObjectMapper objectMapper;
@@ -154,6 +158,10 @@ public class InsightService {
     // 인사이트 존재 여부 및 조회 권한 검증
     Insight insight = getValidatedInsight(insightId, uuid);
 
+    // 답변이 존재하는지 확인
+    if(!answerRepository.findById(answerToInsightRequest.getAnswerId()).isPresent()) {
+      throw new AnswerNotFoundException(ErrorCode.ANSWER_NOT_FOUND);
+    }
 
 
 
