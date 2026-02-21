@@ -2,6 +2,7 @@ package com.dnd.ahaive.domain.insight.controller;
 
 import com.dnd.ahaive.domain.insight.dto.request.InsightCreateRequest;
 import com.dnd.ahaive.domain.insight.dto.response.InsightCreateResponse;
+import com.dnd.ahaive.domain.insight.dto.response.InsightDetailResponse;
 import com.dnd.ahaive.domain.insight.service.InsightService;
 import com.dnd.ahaive.global.common.response.ResponseDTO;
 import com.dnd.ahaive.global.security.core.CustomUserDetails;
@@ -9,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,5 +34,15 @@ public class InsightController {
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(ResponseDTO.created(insightCreateResponse, "인사이트 생성에 성공하였습니다."));
   }
+
+  @GetMapping("/{id}")
+  public ResponseDTO<InsightDetailResponse> getInsightDetail(@PathVariable Long id,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+    InsightDetailResponse insightDetailResponse = insightService.getInsightDetail(id, userDetails.getUuid());
+
+    return ResponseDTO.of(insightDetailResponse, "인사이트 상세 조회에 성공하였습니다.");
+  }
+
 
 }

@@ -2,6 +2,7 @@ package com.dnd.ahaive.domain.insight.service;
 
 import com.dnd.ahaive.domain.insight.dto.request.InsightCreateRequest;
 import com.dnd.ahaive.domain.insight.dto.response.InsightCreateResponse;
+import com.dnd.ahaive.domain.insight.dto.response.InsightDetailResponse;
 import com.dnd.ahaive.domain.insight.entity.Insight;
 import com.dnd.ahaive.domain.insight.entity.InsightGenerationType;
 import com.dnd.ahaive.domain.insight.entity.InsightPiece;
@@ -23,6 +24,7 @@ import com.dnd.ahaive.infra.claude.ClaudeAiClient;
 import com.dnd.ahaive.infra.claude.prompt.ClaudeAiPrompt;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -39,10 +41,10 @@ public class InsightService {
   private final InsightRepository insightRepository;
   private final InsightPieceRepository insightPieceRepository;
   private final QuestionRepository questionRepository;
+  private final TagRepository tagRepository;
 
   private final ClaudeAiClient claudeAiClient;
   private final ObjectMapper objectMapper;
-  private final TagRepository tagRepository;
 
   @Transactional
   public InsightCreateResponse createInsight(InsightCreateRequest insightCreateRequest, String uuid) {
@@ -120,5 +122,24 @@ public class InsightService {
     }
 
     return insight;
+  }
+
+  @Transactional
+  public InsightDetailResponse getInsightDetail(Long id, String uuid) {
+
+    User user = userRepository.findByUserUuid(uuid).orElseThrow(
+        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND)
+    );
+
+    // 인사이트 존재 여부 및 조회 권한 검증
+    Insight insight = getValidatedInsight(id, uuid);
+
+    // 인사이트 조회수 증가
+    insight.increaseView();
+
+    // 태그 조회
+    List<Tag> tags = tagRepository.findAllByInsightId(insight.getId());
+
+    return InsightDetailResponse.of(insight, tags);
   }
 }
