@@ -1,5 +1,6 @@
 package com.dnd.ahaive.domain.insight.controller;
 
+import com.dnd.ahaive.domain.insight.dto.request.AnswerToInsightRequest;
 import com.dnd.ahaive.domain.insight.dto.request.InsightCreateRequest;
 import com.dnd.ahaive.domain.insight.dto.response.InsightCreateResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightDetailResponse;
@@ -7,6 +8,7 @@ import com.dnd.ahaive.domain.insight.service.InsightService;
 import com.dnd.ahaive.global.common.response.ResponseDTO;
 import com.dnd.ahaive.global.security.core.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -35,13 +37,31 @@ public class InsightController {
         .body(ResponseDTO.created(insightCreateResponse, "인사이트 생성에 성공하였습니다."));
   }
 
-  @GetMapping("/{id}")
-  public ResponseDTO<InsightDetailResponse> getInsightDetail(@PathVariable Long id,
+  /**
+   * 인사이트 상세 조회 API 입니다.
+   * @param insightId 조회할 인사이트의 ID입니다.
+   * @param userDetails 인증된 사용자 정보입니다.
+   * @return ResponseDTO<InsightDetailResponse> 조회된 인사이트 상세 정보를 담은 응답 객체입니다.
+   */
+  @GetMapping("/{insightId}")
+  public ResponseDTO<InsightDetailResponse> getInsightDetail(@PathVariable Long insightId,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-    InsightDetailResponse insightDetailResponse = insightService.getInsightDetail(id, userDetails.getUuid());
+    InsightDetailResponse insightDetailResponse = insightService.getInsightDetail(insightId, userDetails.getUuid());
 
     return ResponseDTO.of(insightDetailResponse, "인사이트 상세 조회에 성공하였습니다.");
+  }
+
+  /**
+   * 답변을 인사이트로 만들기 API 입니다.
+   */
+  @PostMapping("/{insightId}/answer-blocks")
+  public ResponseDTO<?> createInsightFromAnswer(@RequestBody AnswerToInsightRequest answerToInsightRequest,
+      @PathVariable Long insightId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+    insightService.createInsightFromAnswer(answerToInsightRequest, insightId, userDetails.getUuid());
+
+    return ResponseDTO.created(null, "답변을 인사이트로 만드는 데 성공하였습니다.");
   }
 
 

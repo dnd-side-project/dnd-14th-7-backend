@@ -1,5 +1,6 @@
 package com.dnd.ahaive.domain.insight.service;
 
+import com.dnd.ahaive.domain.insight.dto.request.AnswerToInsightRequest;
 import com.dnd.ahaive.domain.insight.dto.request.InsightCreateRequest;
 import com.dnd.ahaive.domain.insight.dto.response.InsightCreateResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightDetailResponse;
@@ -141,5 +142,20 @@ public class InsightService {
     List<Tag> tags = tagRepository.findAllByInsightId(insight.getId());
 
     return InsightDetailResponse.of(insight, tags);
+  }
+
+  @Transactional
+  public void createInsightFromAnswer(AnswerToInsightRequest answerToInsightRequest, Long insightId, String uuid) {
+
+    User user = userRepository.findByUserUuid(uuid).orElseThrow(
+        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND)
+    );
+
+    // 인사이트 존재 여부 및 조회 권한 검증
+    Insight insight = getValidatedInsight(insightId, uuid);
+
+
+
+
   }
 }
