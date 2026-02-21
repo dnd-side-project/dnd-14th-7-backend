@@ -2,12 +2,14 @@ package com.dnd.ahaive.domain.insight.controller;
 
 import com.dnd.ahaive.domain.insight.dto.request.AnswerToInsightRequest;
 import com.dnd.ahaive.domain.insight.dto.request.InsightCreateRequest;
+import com.dnd.ahaive.domain.insight.dto.request.PieceCreateRequest;
 import com.dnd.ahaive.domain.insight.dto.response.InsightCreateResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightDetailResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightPieceResponse;
 import com.dnd.ahaive.domain.insight.service.InsightService;
 import com.dnd.ahaive.global.common.response.ResponseDTO;
 import com.dnd.ahaive.global.security.core.CustomUserDetails;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
@@ -76,6 +78,14 @@ public class InsightController {
   }
 
   @PostMapping("/{insightId}/pieces")
+  public ResponseEntity<ResponseDTO<?>> createInsightPiece(@RequestBody @Valid PieceCreateRequest pieceCreateRequest,
+      @PathVariable Long insightId,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    insightService.createInsightPiece(pieceCreateRequest, insightId, userDetails.getUuid());
+
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(ResponseDTO.created(null, "인사이트 조각 생성에 성공하였습니다."));
+  }
 
 
 

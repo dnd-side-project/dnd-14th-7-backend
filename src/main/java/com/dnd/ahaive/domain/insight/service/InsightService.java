@@ -5,6 +5,7 @@ import com.dnd.ahaive.domain.history.exception.AlreadyConvertedAnswerException;
 import com.dnd.ahaive.domain.history.repository.AnswerInsightPromotionRepository;
 import com.dnd.ahaive.domain.insight.dto.request.AnswerToInsightRequest;
 import com.dnd.ahaive.domain.insight.dto.request.InsightCreateRequest;
+import com.dnd.ahaive.domain.insight.dto.request.PieceCreateRequest;
 import com.dnd.ahaive.domain.insight.dto.response.InsightCreateResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightDetailResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightPieceResponse;
@@ -34,6 +35,7 @@ import com.dnd.ahaive.infra.claude.ClaudeAiClient;
 import com.dnd.ahaive.infra.claude.prompt.ClaudeAiPrompt;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -251,5 +253,21 @@ public class InsightService {
     List<InsightPiece> insightPieces = insightPieceRepository.findAllByInsightIdOrderByCreatedAtAsc(insight.getId());
 
     return InsightPieceResponse.from(insightPieces);
+  }
+
+  @Transactional
+  public void createInsightPiece(@Valid PieceCreateRequest pieceCreateRequest,
+      Long insightId, String uuid) {
+
+    User user = userRepository.findByUserUuid(uuid).orElseThrow(
+        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND)
+    );
+
+    // 인사이트 존재 여부 및 조회 권한 검증
+    Insight insight = getValidatedInsight(insightId, uuid);
+
+    InsightPiece insightPiece = InsightPiece.of(insight, pieceCreateRequest.getContent(), InsightGenerationType.SELF);
+
+    insightPieceRepository.save(insightPiece);
   }
 }
