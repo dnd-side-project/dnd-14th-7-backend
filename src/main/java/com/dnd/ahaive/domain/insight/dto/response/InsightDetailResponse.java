@@ -2,6 +2,7 @@ package com.dnd.ahaive.domain.insight.dto.response;
 
 import com.dnd.ahaive.domain.insight.entity.Insight;
 import com.dnd.ahaive.domain.tag.entity.Tag;
+import com.dnd.ahaive.domain.tag.entity.TagEntity;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
@@ -20,12 +21,12 @@ public class InsightDetailResponse {
   private LocalDateTime createdDate;
   private LocalDateTime updatedDate;
 
-  public static InsightDetailResponse of(Insight insight, List<Tag> tags) {
+  public static InsightDetailResponse of(Insight insight, List<TagEntity> tagEntities) {
     return InsightDetailResponse.builder()
         .insightId(insight.getId())
         .initialThought(insight.getInitThought())
         .title(insight.getTitle())
-        .tags(tags.stream()
+        .tags(tagEntities.stream()
             .map(tag -> TagResponse.builder()
                 .tagId(tag.getId())
                 .tagName(tag.getTagName())

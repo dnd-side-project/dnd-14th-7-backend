@@ -9,9 +9,11 @@ import com.dnd.ahaive.domain.insight.dto.response.InsightDetailResponse;
 import com.dnd.ahaive.domain.insight.entity.Insight;
 import com.dnd.ahaive.domain.insight.entity.InsightGenerationType;
 import com.dnd.ahaive.domain.insight.entity.InsightPiece;
+import com.dnd.ahaive.domain.insight.entity.InsightTag;
 import com.dnd.ahaive.domain.insight.repository.InsightPieceRepository;
 import com.dnd.ahaive.domain.insight.exception.InsightAccessDeniedException;
 import com.dnd.ahaive.domain.insight.repository.InsightRepository;
+import com.dnd.ahaive.domain.insight.repository.InsightTagRepository;
 import com.dnd.ahaive.domain.question.dto.response.AiQuestionResponse;
 import com.dnd.ahaive.domain.question.entity.Answer;
 import com.dnd.ahaive.domain.question.entity.Question;
@@ -21,6 +23,8 @@ import com.dnd.ahaive.domain.question.repository.AnswerRepository;
 import com.dnd.ahaive.domain.question.repository.QuestionRepository;
 import com.dnd.ahaive.domain.tag.dto.response.AiTagResponse;
 import com.dnd.ahaive.domain.tag.entity.Tag;
+import com.dnd.ahaive.domain.tag.entity.TagEntity;
+import com.dnd.ahaive.domain.tag.repository.TagEntityRepository;
 import com.dnd.ahaive.domain.tag.repository.TagRepository;
 import com.dnd.ahaive.domain.user.entity.User;
 import com.dnd.ahaive.domain.user.repository.UserRepository;
@@ -47,7 +51,9 @@ public class InsightService {
   private final InsightRepository insightRepository;
   private final InsightPieceRepository insightPieceRepository;
   private final QuestionRepository questionRepository;
-  private final TagRepository tagRepository;
+  //private final TagRepository tagRepository;
+  private final TagEntityRepository tagEntityRepository;
+  private final InsightTagRepository insightTagRepository;
   private final AnswerRepository answerRepository;
   private final AnswerInsightPromotionRepository answerInsightPromotionRepository;
 
@@ -97,8 +103,16 @@ public class InsightService {
     insightPieceRepository.save(InsightPiece.of(insight, insightPieceContent, InsightGenerationType.INIT));
 
     // 태그 저장
-    tagRepository.saveAll(aiTagResponse.getTags().stream()
-        .map(tagName -> Tag.of(user, insight, tagName)).toList());
+    List<TagEntity> tagEntities = aiTagResponse.getTags().stream()
+        .map(tagName -> TagEntity.of(user, tagName))
+            .toList();
+    tagEntityRepository.saveAll(tagEntities);
+
+    // 생성된 태그 기반 인사이트-태그 엔티티 생성 및 저장
+    List<InsightTag> insightTags = tagEntities.stream()
+        .map(tagEntity -> InsightTag.of(insight, tagEntity))
+            .toList();
+    insightTagRepository.saveAll(insightTags);
 
     // 질문 저장
     questionRepository.saveAll(aiQuestionResponse.getQuestions().stream()
@@ -146,7 +160,9 @@ public class InsightService {
     insight.increaseView();
 
     // 태그 조회
-    List<Tag> tags = tagRepository.findAllByInsightId(insight.getId());
+    List<TagEntity> tags = insightTagRepository.findAllByInsightId(insight.getId()).stream()
+        .map(InsightTag::getTagEntity)
+        .toList();
 
     return InsightDetailResponse.of(insight, tags);
   }
@@ -170,10 +186,5 @@ public class InsightService {
     if(answerInsightPromotionRepository.findByAnswerId(answerToInsightRequest.getAnswerId()).isPresent()) {
       throw new AlreadyConvertedAnswerException(ErrorCode.ALREADY_CONVERTED_ANSWER);
     }
-
-
-
-
-
   }
 }

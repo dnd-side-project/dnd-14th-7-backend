@@ -9,6 +9,6 @@ import org.springframework.data.repository.query.Param;
 public interface InsightTagRepository extends JpaRepository<InsightTag, Long> {
 
   @Query("select it from InsightTag it join fetch it.tagEntity where it.insight.id = :insightId")
-  List<InsightTag> findByInsightId(@Param("insightId") Long insightId);
+  List<InsightTag> findAllByInsightId(@Param("insightId") Long insightId);
 
 }
