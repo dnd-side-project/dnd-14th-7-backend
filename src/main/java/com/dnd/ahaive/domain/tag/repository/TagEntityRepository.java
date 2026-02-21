@@ -7,5 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TagEntityRepository extends JpaRepository<TagEntity, Long> {
 
-    List<TagEntity> findAllByUser(User user);
+  List<TagEntity> findAllByUser(User user);
+
+  List<TagEntity> findAllByUserId(Long userId);
 }

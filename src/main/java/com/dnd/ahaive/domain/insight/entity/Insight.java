@@ -13,11 +13,12 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Insight extends BaseEntity {
+public class Insight {
 
     @Id @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
@@ -30,6 +31,9 @@ public class Insight extends BaseEntity {
     private boolean trash;
 
     private LocalDateTime trashedAt;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -47,6 +51,8 @@ public class Insight extends BaseEntity {
         this.view = 0;
         this.trash = false;
         this.trashedAt = null;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = this.createdAt;
     }
 
     public void moveToTrash() {
@@ -56,6 +62,10 @@ public class Insight extends BaseEntity {
 
     public void increaseView() {
         this.view++;
+    }
+
+    public void refreshUpdatedAt() {
+        this.updatedAt = LocalDateTime.now();
     }
 
     public static Insight from(String initThought, String title, User user) {

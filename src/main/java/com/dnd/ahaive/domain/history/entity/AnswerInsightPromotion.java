@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -31,4 +32,17 @@ public class AnswerInsightPromotion extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "answer_id")
     private Answer answer;
+
+    @Builder
+    private AnswerInsightPromotion(InsightPiece insightPiece, Answer answer) {
+        this.insightPiece = insightPiece;
+        this.answer = answer;
+    }
+
+    public static AnswerInsightPromotion of(InsightPiece insightPiece, Answer answer) {
+        return AnswerInsightPromotion.builder()
+            .insightPiece(insightPiece)
+            .answer(answer)
+            .build();
+    }
 }

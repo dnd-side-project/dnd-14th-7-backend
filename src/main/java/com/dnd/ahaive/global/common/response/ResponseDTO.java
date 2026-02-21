@@ -83,4 +83,14 @@ public class ResponseDTO<T> {
         .build();
   }
 
+  public static <T> ResponseDTO<T> notFound(String message) {
+    return ResponseDTO.<T>builder()
+        .localDateTime(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+        .statusCode("NOT_FOUND")
+        .responseCode(404)
+        .message(message)
+        .data(null)
+        .build();
+  }
+
 }
