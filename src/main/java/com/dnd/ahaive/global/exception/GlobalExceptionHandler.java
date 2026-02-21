@@ -87,20 +87,27 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         .body(ResponseDTO.of(ErrorCode.INVALID_INPUT_VALUE));
   }
 
+  @ExceptionHandler(EntityNotFoundException.class)
+  public ResponseEntity<ResponseDTO> handleEntityNotFoundException(EntityNotFoundException e) {
+    log.error(e.getMessage());
+    return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(ResponseDTO.notFound(e.getMessage()));
+  }
   @ExceptionHandler(InsightNotFoundException.class)
   public ResponseEntity<ResponseDTO> handleInsightNotFoundException(InsightNotFoundException e) {
     log.error(e.getMessage());
     return ResponseEntity
-            .status(HttpStatus.NOT_FOUND)
-            .body(ResponseDTO.of(ErrorCode.INSIGHT_NOT_FOUND));
+        .status(HttpStatus.NOT_FOUND)
+        .body(ResponseDTO.of(ErrorCode.INSIGHT_NOT_FOUND));
   }
 
   @ExceptionHandler(InsightAccessDeniedException.class)
   public ResponseEntity<ResponseDTO> handleInsightAccessDeniedException(InsightAccessDeniedException e) {
     log.error(e.getMessage());
     return ResponseEntity
-            .status(HttpStatus.FORBIDDEN)
-            .body(ResponseDTO.of(ErrorCode.INSIGHT_ACCESS_DENIED));
+        .status(HttpStatus.FORBIDDEN)
+        .body(ResponseDTO.of(ErrorCode.INSIGHT_ACCESS_DENIED));
   }
 
   @ExceptionHandler(AiResponseParseException.class)
