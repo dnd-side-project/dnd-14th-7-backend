@@ -1,5 +1,6 @@
 package com.dnd.ahaive.domain.insight.service;
 
+import com.dnd.ahaive.domain.history.repository.AnswerInsightPromotionRepository;
 import com.dnd.ahaive.domain.insight.dto.request.AnswerToInsightRequest;
 import com.dnd.ahaive.domain.insight.dto.request.InsightCreateRequest;
 import com.dnd.ahaive.domain.insight.dto.response.InsightCreateResponse;
@@ -47,6 +48,7 @@ public class InsightService {
   private final QuestionRepository questionRepository;
   private final TagRepository tagRepository;
   private final AnswerRepository answerRepository;
+  private final AnswerInsightPromotionRepository answerInsightPromotionRepository;
 
   private final ClaudeAiClient claudeAiClient;
   private final ObjectMapper objectMapper;
@@ -161,6 +163,11 @@ public class InsightService {
     // 답변이 존재하는지 확인
     if(!answerRepository.findById(answerToInsightRequest.getAnswerId()).isPresent()) {
       throw new AnswerNotFoundException(ErrorCode.ANSWER_NOT_FOUND);
+    }
+
+    // 이미 인사이트로 변환된 이력이 있는지 확인
+    if(answerInsightPromotionRepository.findByAnswerId(answerToInsightRequest.getAnswerId()).isPresent()) {
+      throw new IllegalStateException("이미 인사이트로 변환된 답변입니다.");
     }
 
 

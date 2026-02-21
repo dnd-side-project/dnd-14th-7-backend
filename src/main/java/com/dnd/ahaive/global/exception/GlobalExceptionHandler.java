@@ -5,6 +5,7 @@ import com.dnd.ahaive.domain.auth.exception.RefreshTokenInvalid;
 import com.dnd.ahaive.domain.auth.exception.TokenInvalid;
 import com.dnd.ahaive.domain.auth.exception.TokenInvalidType;
 import com.dnd.ahaive.domain.auth.exception.TokenNotFound;
+import com.dnd.ahaive.domain.history.exception.AlreadyConvertedAnswerException;
 import com.dnd.ahaive.domain.insight.exception.InsightAccessDeniedException;
 import com.dnd.ahaive.domain.insight.exception.InsightNotFoundException;
 import com.dnd.ahaive.domain.question.exception.AnswerNotFoundException;
@@ -121,10 +122,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(AnswerNotFoundException.class)
   public ResponseEntity<ResponseDTO> handleAnswerNotFoundException(AnswerNotFoundException e) {
-    log.error(e.getMessage());
+    log.error("해당 답변을 찾을 수 없습니다.", e);
     return ResponseEntity
         .status(HttpStatus.NOT_FOUND)
         .body(ResponseDTO.of(ErrorCode.ANSWER_NOT_FOUND));
+  }
+
+  @ExceptionHandler(AlreadyConvertedAnswerException.class)
+  public ResponseEntity<ResponseDTO> handleAlreadyConvertedAnswerException(AlreadyConvertedAnswerException e) {
+    log.error("이미 인사이트 조각으로 변환된 답변입니다.", e);
+    return ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+        .body(ResponseDTO.of(ErrorCode.ALREADY_CONVERTED_ANSWER));
   }
 
   @ExceptionHandler(Exception.class)
