@@ -9,11 +9,23 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(
+        name = "insight_tag",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_insight_tag_insight_id_tag_id",
+                        columnNames = {"insight_id", "tag_entity_id"}
+                )
+        }
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class InsightTag extends BaseEntity {
@@ -31,5 +43,16 @@ public class InsightTag extends BaseEntity {
     @JoinColumn(name = "insight_id")
     private Insight insight;
 
+    @Builder
+    private InsightTag(TagEntity tagEntity, Insight insight) {
+        this.tagEntity = tagEntity;
+        this.insight = insight;
+    }
 
+    public static InsightTag of(TagEntity tagEntity, Insight insight) {
+        return InsightTag.builder()
+                .tagEntity(tagEntity)
+                .insight(insight)
+                .build();
+    }
 }

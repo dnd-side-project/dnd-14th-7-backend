@@ -26,7 +26,7 @@ public class TagController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/api/v1/users/tags")
     public ResponseDTO<?> registerTag(@RequestBody TagRegisterRequestDto tagRegisterRequestDto,
-                                 @AuthenticationPrincipal CustomUserDetails userDetails) {
+                                      @AuthenticationPrincipal CustomUserDetails userDetails) {
         tagService.register(tagRegisterRequestDto, userDetails.getUuid());
         return ResponseDTO.of("success");
     }
@@ -40,6 +40,15 @@ public class TagController {
                                     @PathVariable("tagId") long tagId,
                                     @AuthenticationPrincipal CustomUserDetails userDetails) {
         tagService.delete(insightId, tagId, userDetails.getUuid());
+        return ResponseDTO.of("success");
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping("/api/v1/insights/{insightId}/tag/{tagId}")
+    public ResponseDTO<?> addTagInInsight(@PathVariable("insightId") long insightId,
+                                          @PathVariable("tagId") long tagId,
+                                          @AuthenticationPrincipal CustomUserDetails userDetails) {
+        tagService.addTag(insightId, tagId, userDetails.getUuid());
         return ResponseDTO.of("success");
     }
 }

@@ -3,6 +3,7 @@ package com.dnd.ahaive.domain.tag.service;
 import com.dnd.ahaive.domain.insight.entity.Insight;
 import com.dnd.ahaive.domain.insight.service.InsightService;
 import com.dnd.ahaive.domain.tag.controller.dto.TagRegisterRequestDto;
+import com.dnd.ahaive.domain.tag.entity.InsightTag;
 import com.dnd.ahaive.domain.tag.entity.TagEntity;
 import com.dnd.ahaive.domain.tag.repository.InsightTagRepository;
 import com.dnd.ahaive.domain.tag.repository.TagEntityRepository;
@@ -11,6 +12,7 @@ import com.dnd.ahaive.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,5 +54,31 @@ public class TagService {
         }
 
         insightTagRepository.deleteByTagEntityIdAndInsightId(tagId, insightId);
+    }
+
+    @Transactional
+    public long addTag(long insightId, long tagId, String uuid) {
+        Insight insight = insightService.getValidatedInsight(insightId, uuid);
+
+        User user = userRepository.findByUserUuid(uuid)
+                .orElseThrow(() -> new EntityNotFoundException("해당 회원이 존재하지 않습니다. uuid: " + uuid));
+
+        TagEntity tag = tagEntityRepository.findByIdAndUser(tagId, user)
+                .orElseThrow(() -> new EntityNotFoundException("해당 태그가 존재하지 않습니다. tagId: " + tagId));
+
+        if (insightTagRepository.existsByInsightIdAndTagEntityId(insightId, tagId)) {
+            InsightTag findInsightTag = insightTagRepository.findByInsightIdAndTagEntityId(insightId, tagId)
+                    .orElseThrow(() -> new IllegalStateException("이미 연결된 태그인데 조회에 실패했습니다. insightId : " + insightId + ", tagId : " + tagId));
+            return findInsightTag.getId();
+        }
+
+        try {
+            InsightTag insightTag = InsightTag.of(tag, insight);
+            return insightTagRepository.save(insightTag).getId();
+        } catch (DataIntegrityViolationException e) {
+            InsightTag insightTag = insightTagRepository.findByInsightIdAndTagEntityId(insightId, tagId)
+                    .orElseThrow(() -> e);
+            return insightTag.getId();
+        }
     }
 }
