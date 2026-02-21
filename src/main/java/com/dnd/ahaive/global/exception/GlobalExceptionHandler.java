@@ -7,6 +7,7 @@ import com.dnd.ahaive.domain.auth.exception.TokenInvalidType;
 import com.dnd.ahaive.domain.auth.exception.TokenNotFound;
 import com.dnd.ahaive.domain.insight.exception.InsightAccessDeniedException;
 import com.dnd.ahaive.domain.insight.exception.InsightNotFoundException;
+import com.dnd.ahaive.domain.question.exception.AnswerNotFoundException;
 import com.dnd.ahaive.global.common.response.ResponseDTO;
 import com.dnd.ahaive.global.security.exception.UserNotFoundException;
 import com.dnd.ahaive.infra.claude.exception.AiCallException;
@@ -116,6 +117,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     return ResponseEntity
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .body(ResponseDTO.of(e.getErrorCode()));
+  }
+
+  @ExceptionHandler(AnswerNotFoundException.class)
+  public ResponseEntity<ResponseDTO> handleAnswerNotFoundException(AnswerNotFoundException e) {
+    log.error(e.getMessage());
+    return ResponseEntity
+        .status(HttpStatus.NOT_FOUND)
+        .body(ResponseDTO.of(ErrorCode.ANSWER_NOT_FOUND));
   }
 
   @ExceptionHandler(Exception.class)
