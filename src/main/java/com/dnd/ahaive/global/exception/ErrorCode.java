@@ -13,6 +13,7 @@ public enum ErrorCode {
     DUPLICATED_BOOKMARK(400, "DUPLICATED_BOOKMARK", "이미 북마크 되어있는 게시글입니다."),
     NOT_LIKE(400,"NOT_LIKE", "좋아요를 누르지 않았습니다."),
     NOT_BOOKMARK(400,"NOT_BOOKMARK", "북마크 되어있지 않은 게시글입니다."),
+    ALREADY_CONVERTED_ANSWER(400, "ALREADY_CONVERTED_ANSWER", "이미 인사이트로 변환된 답변입니다."),
 
     // 400 Bad Request 검색 관련
     INVALID_SEARCH_KEYWORD_LENGTH(400, "INVALID_SEARCH_KEYWORD_LENGTH", "검색어는 2자 이상 입력해주세요."),
@@ -73,6 +74,7 @@ public enum ErrorCode {
     FORBIDDEN(403, "FORBIDDEN", "접근 권한이 없습니다."),
     ACCESS_DENIED(403, "ACCESS_DENIED", "이 기능에 접근할 수 없습니다."),
     INSUFFICIENT_GENERATION_COUNT(403, "INSUFFICIENT_GENERATION_COUNT", "AI 생성 가능 횟수를 모두 사용했습니다."),
+    INSIGHT_ACCESS_DENIED(403, "INSIGHT_ACCESS_DENIED", "해당 인사이트에 대한 접근 권한이 없습니다."),
 
 
     // 404 Not Found
@@ -88,6 +90,9 @@ public enum ErrorCode {
     CATEGORY_NOT_FOUND(404, "CATEGORY_NOT_FOUND", "해당 카테고리를 찾을 수 없습니다."),
     COVER_LETTER_NOT_FOUND(404, "COVER_LETTER_NOT_FOUND", "자기소개서를 찾을 수 없습니다."),
     TOKEN_NOT_FOUND(404, "TOKEN_NOT_FOUND", "토큰이 존재하지 않습니다."),
+    INSIGHT_NOT_FOUND(404, "INSIGHT_NOT_FOUND", "해당 인사이트를 찾을 수 없습니다."),
+    ANSWER_NOT_FOUND(404, "ANSWER_NOT_FOUND", "해당 답변을 찾을 수 없습니다."),
+
 
     // 405 Method Not Allowed
     METHOD_NOT_ALLOWED(405, "METHOD_NOT_ALLOWED", "허용되지 않은 HTTP 메서드입니다."),
