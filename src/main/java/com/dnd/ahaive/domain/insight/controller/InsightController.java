@@ -56,13 +56,12 @@ public class InsightController {
    * 답변을 인사이트로 만들기 API 입니다.
    */
   @PostMapping("/{insightId}/answer-blocks")
-  public ResponseDTO<?> createInsightFromAnswer(@RequestBody AnswerToInsightRequest answerToInsightRequest,
+  public ResponseEntity<ResponseDTO<?>> createInsightFromAnswer(@RequestBody AnswerToInsightRequest answerToInsightRequest,
       @PathVariable Long insightId, @AuthenticationPrincipal CustomUserDetails userDetails) {
 
     insightService.createInsightFromAnswer(answerToInsightRequest, insightId, userDetails.getUuid());
 
-    return ResponseDTO.created(null, "답변을 인사이트로 만드는 데 성공하였습니다.");
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(ResponseDTO.created(null, "답변을 인사이트로 만드는 데 성공하였습니다."));
   }
-
-
 }

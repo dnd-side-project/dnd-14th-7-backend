@@ -1,5 +1,6 @@
 package com.dnd.ahaive.domain.insight.service;
 
+import com.dnd.ahaive.domain.history.entity.AnswerInsightPromotion;
 import com.dnd.ahaive.domain.history.exception.AlreadyConvertedAnswerException;
 import com.dnd.ahaive.domain.history.repository.AnswerInsightPromotionRepository;
 import com.dnd.ahaive.domain.insight.dto.request.AnswerToInsightRequest;
@@ -34,9 +35,13 @@ import com.dnd.ahaive.infra.claude.ClaudeAiClient;
 import com.dnd.ahaive.infra.claude.prompt.ClaudeAiPrompt;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -102,17 +107,8 @@ public class InsightService {
     // 인사이트 조각 저장
     insightPieceRepository.save(InsightPiece.of(insight, insightPieceContent, InsightGenerationType.INIT));
 
-    // 태그 저장
-    List<TagEntity> tagEntities = aiTagResponse.getTags().stream()
-        .map(tagName -> TagEntity.of(user, tagName))
-            .toList();
-    tagEntityRepository.saveAll(tagEntities);
-
-    // 생성된 태그 기반 인사이트-태그 엔티티 생성 및 저장
-    List<InsightTag> insightTags = tagEntities.stream()
-        .map(tagEntity -> InsightTag.of(insight, tagEntity))
-            .toList();
-    insightTagRepository.saveAll(insightTags);
+    // 태그 저장 및 인사이트-태그 연결
+    saveInsightTags(insight, aiTagResponse.getTags(), user);
 
     // 질문 저장
     questionRepository.saveAll(aiQuestionResponse.getQuestions().stream()
@@ -178,13 +174,68 @@ public class InsightService {
     Insight insight = getValidatedInsight(insightId, uuid);
 
     // 답변이 존재하는지 확인
-    if(!answerRepository.findById(answerToInsightRequest.getAnswerId()).isPresent()) {
-      throw new AnswerNotFoundException(ErrorCode.ANSWER_NOT_FOUND);
-    }
+    Answer answer = answerRepository.findById(answerToInsightRequest.getAnswerId())
+        .orElseThrow(() -> new AnswerNotFoundException(ErrorCode.ANSWER_NOT_FOUND));
 
     // 이미 인사이트로 변환된 이력이 있는지 확인
     if(answerInsightPromotionRepository.findByAnswerId(answerToInsightRequest.getAnswerId()).isPresent()) {
       throw new AlreadyConvertedAnswerException(ErrorCode.ALREADY_CONVERTED_ANSWER);
     }
+
+    // 답변-인사이트 변환 및 인사이트를 저장
+    String insightContent = claudeAiClient.sendMessage(ClaudeAiPrompt.ANSWER_TO_INSIGHT_PROMPT(answer.getContent()));
+    InsightPiece insightPiece = InsightPiece.of(insight, insightContent,InsightGenerationType.ANSWER);
+
+    insightPieceRepository.save(insightPiece);
+
+    // 답변-인사이트 변환 이력 저장
+    AnswerInsightPromotion answerInsightPromotion = AnswerInsightPromotion.of(insightPiece, answer);
+    answerInsightPromotionRepository.save(answerInsightPromotion);
+
+    // 답변 인사이트로 변환됨
+    answer.convert();
+  }
+
+  /**
+   * 태그 이름들을 받아 저장하고 인사이트와 연결합니다.
+   * 같은 이름의 태그가 이미 있다면 재사용하고, 새로운 태그만 저장합니다.
+   * @param insight 연결할 인사이트 객체
+   * @param tagNames 태그 이름 리스트
+   * @param user 태그를 저장할 사용자 객체
+   */
+  @Transactional
+  public void saveInsightTags(Insight insight, List<String> tagNames, User user) {
+
+    // 기존 유저 태그 조회
+    Map<String, TagEntity> existingTagMap = tagEntityRepository.findAllByUserId(user.getId())
+        .stream()
+        .collect(Collectors.toMap(TagEntity::getTagName, tag -> tag));
+
+    List<String> newTagNames = tagNames.stream()
+        .filter(tagName -> !existingTagMap.containsKey(tagName))
+        .toList();
+
+    List<String> duplicatedTagNames = tagNames.stream()
+        .filter(existingTagMap::containsKey)
+        .toList();
+
+    // 새로운 태그 저장
+    List<TagEntity> newTagEntities = newTagNames.stream()
+        .map(tagName -> TagEntity.of(user, tagName))
+        .toList();
+    tagEntityRepository.saveAll(newTagEntities);
+
+    // 인사이트-태그 생성 (새로운 태그 + 기존 중복 태그)
+    List<InsightTag> insightTags = new ArrayList<>();
+
+    newTagEntities.stream()
+        .map(tagEntity -> InsightTag.of(insight, tagEntity))
+        .forEach(insightTags::add);
+
+    duplicatedTagNames.stream()
+        .map(tagName -> InsightTag.of(insight, existingTagMap.get(tagName)))
+        .forEach(insightTags::add);
+
+    insightTagRepository.saveAll(insightTags);
   }
 }

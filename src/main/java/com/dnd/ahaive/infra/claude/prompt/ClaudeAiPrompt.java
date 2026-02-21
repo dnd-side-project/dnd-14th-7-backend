@@ -53,5 +53,17 @@ public class ClaudeAiPrompt {
         """.formatted(initThought);
   }
 
+  public static String ANSWER_TO_INSIGHT_PROMPT(String answer){
+    return """
+        다음 답변을 핵심 인사이트 한 문장으로 변환해줘. 인사이트 문장만 출력하고 "인사이트:" 같은 접두사나 부가 설명은 절대 포함하지 마.
+        
+        예시:
+        답변: 서버에서 특정 요청이 간헐적으로 실패했는데, 관련 로그가 남아 있지 않아 어떤 조건에서 발생하는지 확인할 수 없었다.\s
+                                결국 동일한 상황을 로컬에서 재현하려고 여러 번 테스트했지만, 재현되지 않아 원인 파악에 하루 이상이 소요되었다.
+        출력: 간헐적 요청 실패에 대한 로그 부재로 원인 파악에 하루 이상 소요되었으며, 충분한 로그를 남겨두는 것이 중요함을 느꼈다.
+        
+        답변: %s
+        """.formatted(answer);
+  }
 
 }

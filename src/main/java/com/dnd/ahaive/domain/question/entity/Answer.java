@@ -41,4 +41,8 @@ public class Answer extends BaseEntity {
     public static Answer of(Question question, String content, boolean isConverted) {
         return Answer.builder().question(question).content(content).isConverted(isConverted).build();
     }
+
+    public void convert() {
+        this.isConverted = true;
+    }
 }
