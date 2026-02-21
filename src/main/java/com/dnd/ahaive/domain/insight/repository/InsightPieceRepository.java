@@ -5,5 +5,6 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface InsightPieceRepository extends JpaRepository<InsightPiece, Long> {
-  List<InsightPiece> findAllByInsightId(Long insightId);
+  List<InsightPiece> findAllByInsightIdOrderByCreatedAtAsc(Long insightId);
+
 }

@@ -248,7 +248,7 @@ public class InsightService {
     // 인사이트 존재 여부 및 조회 권한 검증
     Insight insight = getValidatedInsight(insightId, uuid);
 
-    List<InsightPiece> insightPieces = insightPieceRepository.findAllByInsightId(insight.getId());
+    List<InsightPiece> insightPieces = insightPieceRepository.findAllByInsightIdOrderByCreatedAtAsc(insight.getId());
 
     return InsightPieceResponse.from(insightPieces);
   }
