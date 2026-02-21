@@ -1,5 +1,6 @@
 package com.dnd.ahaive.domain.insight.service;
 
+import com.dnd.ahaive.domain.history.exception.AlreadyConvertedAnswerException;
 import com.dnd.ahaive.domain.history.repository.AnswerInsightPromotionRepository;
 import com.dnd.ahaive.domain.insight.dto.request.AnswerToInsightRequest;
 import com.dnd.ahaive.domain.insight.dto.request.InsightCreateRequest;
@@ -167,8 +168,10 @@ public class InsightService {
 
     // 이미 인사이트로 변환된 이력이 있는지 확인
     if(answerInsightPromotionRepository.findByAnswerId(answerToInsightRequest.getAnswerId()).isPresent()) {
-      throw new IllegalStateException("이미 인사이트로 변환된 답변입니다.");
+      throw new AlreadyConvertedAnswerException(ErrorCode.ALREADY_CONVERTED_ANSWER);
     }
+
+
 
 
 
