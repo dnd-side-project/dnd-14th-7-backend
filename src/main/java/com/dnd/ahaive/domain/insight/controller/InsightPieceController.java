@@ -6,6 +6,7 @@ import com.dnd.ahaive.global.common.response.ResponseDTO;
 import com.dnd.ahaive.global.security.core.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +27,15 @@ public class InsightPieceController {
     insightService.updateInsightPiece(pieceId, pieceUpdateRequest, customUserDetails.getUuid());
 
     return ResponseDTO.of("인사이트 조각 수정에 성공하였습니다.");
+  }
+
+  @DeleteMapping("/{pieceId}")
+  public ResponseDTO<?> deleteInsightPiece(@PathVariable("pieceId") String pieceId,
+      @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+
+    insightService.deleteInsightPiece(pieceId, customUserDetails.getUuid());
+
+    return ResponseDTO.of("인사이트 조각 삭제에 성공하였습니다.");
   }
 
 }

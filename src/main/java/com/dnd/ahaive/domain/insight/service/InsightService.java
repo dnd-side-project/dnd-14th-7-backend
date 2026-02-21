@@ -284,4 +284,16 @@ public class InsightService {
 
     insightPiece.updateContent(pieceUpdateRequest.getContent());
   }
+
+  @Transactional
+  public void deleteInsightPiece(String pieceId, String uuid) {
+    User user = userRepository.findByUserUuid(uuid).orElseThrow(
+        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND)
+    );
+
+    InsightPiece insightPiece = insightPieceRepository.findById(Long.parseLong(pieceId))
+        .orElseThrow(() -> new InsightNotFoundException(ErrorCode.INSIGHT_NOT_FOUND));
+
+    insightPieceRepository.delete(insightPiece);
+  }
 }
