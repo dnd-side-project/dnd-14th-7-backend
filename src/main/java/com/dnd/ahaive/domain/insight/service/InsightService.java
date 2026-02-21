@@ -173,14 +173,17 @@ public class InsightService {
     Insight insight = getValidatedInsight(insightId, uuid);
 
     // 답변이 존재하는지 확인
-    if(!answerRepository.findById(answerToInsightRequest.getAnswerId()).isPresent()) {
-      throw new AnswerNotFoundException(ErrorCode.ANSWER_NOT_FOUND);
-    }
+    Answer answer = answerRepository.findById(answerToInsightRequest.getAnswerId())
+        .orElseThrow(() -> new AnswerNotFoundException(ErrorCode.ANSWER_NOT_FOUND));
 
     // 이미 인사이트로 변환된 이력이 있는지 확인
     if(answerInsightPromotionRepository.findByAnswerId(answerToInsightRequest.getAnswerId()).isPresent()) {
       throw new AlreadyConvertedAnswerException(ErrorCode.ALREADY_CONVERTED_ANSWER);
     }
+
+
+
+
   }
 
   /**

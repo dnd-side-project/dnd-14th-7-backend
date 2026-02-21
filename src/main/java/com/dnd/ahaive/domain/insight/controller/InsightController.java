@@ -63,6 +63,4 @@ public class InsightController {
 
     return ResponseDTO.created(null, "답변을 인사이트로 만드는 데 성공하였습니다.");
   }
-
-
 }
