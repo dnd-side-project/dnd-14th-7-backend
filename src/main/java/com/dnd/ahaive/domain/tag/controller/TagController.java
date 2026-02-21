@@ -20,6 +20,9 @@ public class TagController {
 
     private final TagService tagService;
 
+    /**
+     * 태그 생성 API
+     */
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/api/v1/users/tags")
     public ResponseDTO<?> registerTag(@RequestBody TagRegisterRequestDto tagRegisterRequestDto,
@@ -28,6 +31,9 @@ public class TagController {
         return ResponseDTO.of("success");
     }
 
+    /**
+     * 인사이트에서 태그 삭제 API
+     */
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/api/v1/insights/{insightId}/tag/{tagId}")
     public ResponseDTO<?> deleteTag(@PathVariable("insightId") long insightId,

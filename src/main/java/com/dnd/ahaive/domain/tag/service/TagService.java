@@ -38,8 +38,6 @@ public class TagService {
         // 없으면 추가
         TagEntity tagEntity = TagEntity.of(user, tagName);
         tagEntityRepository.save(tagEntity);
-
-        // 인사이트에 바로 추가되는 로직이 있는지 확인 필요
     }
 
     @Transactional
