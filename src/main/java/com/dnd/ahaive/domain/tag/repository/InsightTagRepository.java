@@ -20,6 +20,7 @@ public interface InsightTagRepository extends JpaRepository<InsightTag, Long> {
 
     @Query("select it from InsightTag it join fetch it.tagEntity where it.insight.id = :insightId")
     List<InsightTag> findAllByInsightId(@Param("insightId") Long insightId);
+
     @Query(""" 
         select new com.dnd.ahaive.domain.tag.service.dto.TagInsightCount(
             t.id,
@@ -33,6 +34,20 @@ public interface InsightTagRepository extends JpaRepository<InsightTag, Long> {
         order by count(it.id) desc, t.id asc
     """)
     List<TagInsightCount> countInsightsByTag(User user);
+
+    @Query(""" 
+        select new com.dnd.ahaive.domain.tag.service.dto.TagInsightCount(
+            t.id,
+            t.tagName,
+            count(it.id)
+        )
+        from InsightTag it
+            join it.tagEntity t
+        where t.user = :user
+        group by t.id, t.tagName
+        order by t.tagName asc
+    """)
+    List<TagInsightCount> findTagInsightCountsOrderByTagName(User user);
 
     @Query("""
         select new com.dnd.ahaive.domain.tag.service.dto.TagInsightTitle(

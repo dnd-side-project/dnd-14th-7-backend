@@ -1,5 +1,6 @@
 package com.dnd.ahaive.domain.tag.controller;
 
+import com.dnd.ahaive.domain.tag.controller.dto.TagSummary;
 import com.dnd.ahaive.domain.tag.controller.dto.TotalInsightSummaryByTag;
 import com.dnd.ahaive.domain.tag.service.InsightTagService;
 import com.dnd.ahaive.global.common.response.ResponseDTO;
@@ -16,6 +17,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class InsightTagController {
 
     private final InsightTagService insightTagService;
+
+    /**
+     * 유저가 등록한 태그 전체 조회 API
+     */
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/api/v1/users/tag")
+    public ResponseDTO<?> getAllTags(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        TagSummary summary = insightTagService.getTagsWithInsightCount(userDetails.getUuid());
+        return ResponseDTO.of(summary, "태그별 인사이트 조회");
+    }
 
     /**
      * 태그별 인사이트 조회 API

@@ -2,6 +2,7 @@ package com.dnd.ahaive.domain.tag.service;
 
 import com.dnd.ahaive.domain.tag.controller.dto.InsightSummary;
 import com.dnd.ahaive.domain.tag.controller.dto.InsightSummaryByTag;
+import com.dnd.ahaive.domain.tag.controller.dto.TagSummary;
 import com.dnd.ahaive.domain.tag.controller.dto.TotalInsightSummaryByTag;
 import com.dnd.ahaive.domain.tag.repository.InsightTagRepository;
 import com.dnd.ahaive.domain.tag.service.dto.TagInsightCount;
@@ -23,6 +24,17 @@ public class InsightTagService {
 
     private final UserRepository userRepository;
     private final InsightTagRepository insightTagRepository;
+
+    @Transactional(readOnly = true)
+    public TagSummary getTagsWithInsightCount(String uuid) {
+        User user = userRepository.findByUserUuid(uuid)
+                .orElseThrow(() -> new EntityNotFoundException("회원을 찾을 수 없습니다. uuid: " + uuid));
+
+        List<TagInsightCount> tagInsightCountsOrderByTagName =
+                insightTagRepository.findTagInsightCountsOrderByTagName(user);
+
+        return new TagSummary(tagInsightCountsOrderByTagName);
+    }
 
     @Transactional(readOnly = true)
     public TotalInsightSummaryByTag getInsightsGroupByTag(String uuid) {
