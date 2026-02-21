@@ -4,6 +4,7 @@ import com.dnd.ahaive.domain.insight.dto.request.AnswerToInsightRequest;
 import com.dnd.ahaive.domain.insight.dto.request.InsightCreateRequest;
 import com.dnd.ahaive.domain.insight.dto.response.InsightCreateResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightDetailResponse;
+import com.dnd.ahaive.domain.insight.dto.response.InsightPieceResponse;
 import com.dnd.ahaive.domain.insight.service.InsightService;
 import com.dnd.ahaive.global.common.response.ResponseDTO;
 import com.dnd.ahaive.global.security.core.CustomUserDetails;
@@ -63,5 +64,14 @@ public class InsightController {
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(ResponseDTO.created(null, "답변을 인사이트로 만드는 데 성공하였습니다."));
+  }
+
+  @GetMapping("/{insightId}/list")
+  public ResponseDTO<InsightPieceResponse> getInsightPieces(@PathVariable Long insightId,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+    InsightPieceResponse insightPieceResponse = insightService.getInsightPieces(insightId, userDetails.getUuid());
+
+    return ResponseDTO.of(insightPieceResponse, "인사이트 조각 조회에 성공하였습니다.");
   }
 }
