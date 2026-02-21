@@ -75,5 +75,8 @@ public class InsightController {
     return ResponseDTO.of(insightPieceResponse, "인사이트 조각 조회에 성공하였습니다.");
   }
 
+  @PostMapping("/{insightId}/pieces")
+
+
 
 }
