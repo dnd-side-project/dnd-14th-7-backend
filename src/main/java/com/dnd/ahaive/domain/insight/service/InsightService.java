@@ -7,14 +7,13 @@ import com.dnd.ahaive.domain.insight.dto.request.AnswerToInsightRequest;
 import com.dnd.ahaive.domain.insight.dto.request.InsightCreateRequest;
 import com.dnd.ahaive.domain.insight.dto.response.InsightCreateResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightDetailResponse;
+import com.dnd.ahaive.domain.insight.dto.response.InsightPieceResponse;
 import com.dnd.ahaive.domain.insight.entity.Insight;
 import com.dnd.ahaive.domain.insight.entity.InsightGenerationType;
 import com.dnd.ahaive.domain.insight.entity.InsightPiece;
-import com.dnd.ahaive.domain.insight.entity.InsightTag;
 import com.dnd.ahaive.domain.insight.repository.InsightPieceRepository;
 import com.dnd.ahaive.domain.insight.exception.InsightAccessDeniedException;
 import com.dnd.ahaive.domain.insight.repository.InsightRepository;
-import com.dnd.ahaive.domain.insight.repository.InsightTagRepository;
 import com.dnd.ahaive.domain.question.dto.response.AiQuestionResponse;
 import com.dnd.ahaive.domain.question.entity.Answer;
 import com.dnd.ahaive.domain.question.entity.Question;
@@ -23,10 +22,10 @@ import com.dnd.ahaive.domain.question.exception.AnswerNotFoundException;
 import com.dnd.ahaive.domain.question.repository.AnswerRepository;
 import com.dnd.ahaive.domain.question.repository.QuestionRepository;
 import com.dnd.ahaive.domain.tag.dto.response.AiTagResponse;
-import com.dnd.ahaive.domain.tag.entity.Tag;
+import com.dnd.ahaive.domain.tag.entity.InsightTag;
 import com.dnd.ahaive.domain.tag.entity.TagEntity;
+import com.dnd.ahaive.domain.tag.repository.InsightTagRepository;
 import com.dnd.ahaive.domain.tag.repository.TagEntityRepository;
-import com.dnd.ahaive.domain.tag.repository.TagRepository;
 import com.dnd.ahaive.domain.user.entity.User;
 import com.dnd.ahaive.domain.user.repository.UserRepository;
 import com.dnd.ahaive.global.exception.ErrorCode;
@@ -229,13 +228,28 @@ public class InsightService {
     List<InsightTag> insightTags = new ArrayList<>();
 
     newTagEntities.stream()
-        .map(tagEntity -> InsightTag.of(insight, tagEntity))
+        .map(tagEntity -> InsightTag.of(tagEntity, insight))
         .forEach(insightTags::add);
 
     duplicatedTagNames.stream()
-        .map(tagName -> InsightTag.of(insight, existingTagMap.get(tagName)))
+        .map(tagName -> InsightTag.of(existingTagMap.get(tagName), insight))
         .forEach(insightTags::add);
 
     insightTagRepository.saveAll(insightTags);
+  }
+
+  @Transactional(readOnly = true)
+  public InsightPieceResponse getInsightPieces(Long insightId, String uuid) {
+
+    User user = userRepository.findByUserUuid(uuid).orElseThrow(
+        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND)
+    );
+
+    // 인사이트 존재 여부 및 조회 권한 검증
+    Insight insight = getValidatedInsight(insightId, uuid);
+
+    List<InsightPiece> insightPieces = insightPieceRepository.findAllByInsightIdOrderByCreatedAtAsc(insight.getId());
+
+    return InsightPieceResponse.from(insightPieces);
   }
 }
