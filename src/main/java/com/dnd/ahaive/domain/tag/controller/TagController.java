@@ -36,10 +36,10 @@ public class TagController {
      */
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/api/v1/insights/{insightId}/tag/{tagId}")
-    public ResponseDTO<?> deleteTag(@PathVariable("insightId") long insightId,
-                                    @PathVariable("tagId") long tagId,
-                                    @AuthenticationPrincipal CustomUserDetails userDetails) {
-        tagService.delete(insightId, tagId, userDetails.getUuid());
+    public ResponseDTO<?> removeTagFromInsight(@PathVariable("insightId") long insightId,
+                                               @PathVariable("tagId") long tagId,
+                                               @AuthenticationPrincipal CustomUserDetails userDetails) {
+        tagService.removeTagFromInsight(insightId, tagId, userDetails.getUuid());
         return ResponseDTO.of("success");
     }
 

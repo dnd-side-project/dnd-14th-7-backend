@@ -43,7 +43,7 @@ public class TagService {
     }
 
     @Transactional
-    public void delete(long insightId, long tagId, String uuid) {
+    public void removeTagFromInsight(long insightId, long tagId, String uuid) {
         Insight insight = insightService.getValidatedInsight(insightId, uuid);
         TagEntity tagEntity = tagEntityRepository.findById(tagId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 태그가 존재하지 않습니다. tagId: " + tagId));
