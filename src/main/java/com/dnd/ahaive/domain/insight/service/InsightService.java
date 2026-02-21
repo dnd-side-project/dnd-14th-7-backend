@@ -1,5 +1,6 @@
 package com.dnd.ahaive.domain.insight.service;
 
+import com.dnd.ahaive.domain.history.entity.AnswerInsightPromotion;
 import com.dnd.ahaive.domain.history.exception.AlreadyConvertedAnswerException;
 import com.dnd.ahaive.domain.history.repository.AnswerInsightPromotionRepository;
 import com.dnd.ahaive.domain.insight.dto.request.AnswerToInsightRequest;
@@ -181,9 +182,18 @@ public class InsightService {
       throw new AlreadyConvertedAnswerException(ErrorCode.ALREADY_CONVERTED_ANSWER);
     }
 
+    // 답변-인사이트 변환 및 인사이트를 저장
+    String insightContent = claudeAiClient.sendMessage(ClaudeAiPrompt.ANSWER_TO_INSIGHT_PROMPT(answer.getContent()));
+    InsightPiece insightPiece = InsightPiece.of(insight, insightContent,InsightGenerationType.ANSWER);
 
+    insightPieceRepository.save(insightPiece);
 
+    // 답변-인사이트 변환 이력 저장
+    AnswerInsightPromotion answerInsightPromotion = AnswerInsightPromotion.of(insightPiece, answer);
+    answerInsightPromotionRepository.save(answerInsightPromotion);
 
+    // 답변 인사이트로 변환됨
+    answer.convert();
   }
 
   /**
