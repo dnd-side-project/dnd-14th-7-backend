@@ -41,6 +41,10 @@ public class InsightPiece extends BaseEntity {
         this.createdType = createdType;
     }
 
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
     public static InsightPiece of(Insight insight, String content, InsightGenerationType createdType) {
         return InsightPiece.builder()
             .insight(insight)
