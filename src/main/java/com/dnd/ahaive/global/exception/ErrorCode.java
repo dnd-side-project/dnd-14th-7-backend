@@ -73,6 +73,7 @@ public enum ErrorCode {
     FORBIDDEN(403, "FORBIDDEN", "접근 권한이 없습니다."),
     ACCESS_DENIED(403, "ACCESS_DENIED", "이 기능에 접근할 수 없습니다."),
     INSUFFICIENT_GENERATION_COUNT(403, "INSUFFICIENT_GENERATION_COUNT", "AI 생성 가능 횟수를 모두 사용했습니다."),
+    INSIGHT_ACCESS_DENIED(403, "INSIGHT_ACCESS_DENIED", "해당 인사이트에 대한 접근 권한이 없습니다."),
 
 
     // 404 Not Found

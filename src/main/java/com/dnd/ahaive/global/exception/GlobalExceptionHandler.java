@@ -5,6 +5,8 @@ import com.dnd.ahaive.domain.auth.exception.RefreshTokenInvalid;
 import com.dnd.ahaive.domain.auth.exception.TokenInvalid;
 import com.dnd.ahaive.domain.auth.exception.TokenInvalidType;
 import com.dnd.ahaive.domain.auth.exception.TokenNotFound;
+import com.dnd.ahaive.domain.insight.exception.InsightAccessDeniedException;
+import com.dnd.ahaive.domain.insight.exception.InsightNotFoundException;
 import com.dnd.ahaive.global.common.response.ResponseDTO;
 import com.dnd.ahaive.global.security.exception.UserNotFoundException;
 import com.dnd.ahaive.infra.claude.exception.AiCallException;
@@ -85,12 +87,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         .body(ResponseDTO.of(ErrorCode.INVALID_INPUT_VALUE));
   }
 
-  @ExceptionHandler(EntityNotFoundException.class)
-  public ResponseEntity<ResponseDTO> handleEntityNotFoundException(EntityNotFoundException e) {
+  @ExceptionHandler(InsightNotFoundException.class)
+  public ResponseEntity<ResponseDTO> handleInsightNotFoundException(InsightNotFoundException e) {
     log.error(e.getMessage());
     return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
-            .body(ResponseDTO.of(e.getMessage()));
+            .body(ResponseDTO.of(ErrorCode.INSIGHT_NOT_FOUND));
+  }
+
+  @ExceptionHandler(InsightAccessDeniedException.class)
+  public ResponseEntity<ResponseDTO> handleInsightAccessDeniedException(InsightAccessDeniedException e) {
+    log.error(e.getMessage());
+    return ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
+            .body(ResponseDTO.of(ErrorCode.INSIGHT_ACCESS_DENIED));
   }
 
   @ExceptionHandler(AiResponseParseException.class)
