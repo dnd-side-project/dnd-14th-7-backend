@@ -64,7 +64,6 @@ public class ClaudeAiPrompt {
         
         답변: %s
         """.formatted(answer);
-  }}
-
+  }
 
 }
