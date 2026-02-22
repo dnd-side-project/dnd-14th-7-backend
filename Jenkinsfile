@@ -67,7 +67,7 @@ pipeline {
                 echo 'deploy the application...'
                 sshagent(credentials: ['service_ec2_ssh']) {
                             sh """
-                                ssh -o StrictHostKeyChecking=no ${SERVICE_EC2_USER}@${SERVICE_EC2_IP} '
+                                ssh -v -o StrictHostKeyChecking=no ${SERVICE_EC2_USER}@${SERVICE_EC2_IP} '
                                     # ECR 로그인
                                     aws ecr get-login-password --region ap-northeast-2 | \
                                     docker login --username AWS --password-stdin ${ECR_PATH}
