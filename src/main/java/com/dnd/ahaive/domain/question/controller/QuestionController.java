@@ -3,6 +3,7 @@ package com.dnd.ahaive.domain.question.controller;
 import com.dnd.ahaive.domain.question.controller.dto.TotalArchivedQuestionResponse;
 import com.dnd.ahaive.domain.question.controller.dto.TotalQuestionDto;
 import com.dnd.ahaive.domain.question.service.QuestionService;
+import com.dnd.ahaive.domain.question.service.QuestionsFacadeService;
 import com.dnd.ahaive.global.common.response.ResponseDTO;
 import com.dnd.ahaive.global.security.core.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class QuestionController {
 
     private final QuestionService questionService;
+    private final QuestionsFacadeService questionsFacadeService;
 
     /**
      * 질문 리스트 조회
@@ -27,7 +29,6 @@ public class QuestionController {
     @ResponseStatus(code = HttpStatus.OK)
     public ResponseDTO<TotalQuestionDto> questions(@PathVariable("id") long insightId,
                                                    @AuthenticationPrincipal CustomUserDetails userDetails) {
-
         TotalQuestionDto totalQuestionDto = questionService.findQuestionAndAnswers(insightId,
                 userDetails.getUuid());
         return ResponseDTO.of(totalQuestionDto, "success");
@@ -44,6 +45,9 @@ public class QuestionController {
         return ResponseDTO.of(totalArchivedQuestionResponse, "success");
     }
 
+    /**
+     * 이전 질문(보관된 질문) 롤백
+     */
     @PostMapping("/api/v1/insights/{id}/questions/{questionId}/rollback")
     @ResponseStatus(code = HttpStatus.OK)
     public ResponseDTO<?> rollback(@PathVariable("id") long insightId,
@@ -53,4 +57,14 @@ public class QuestionController {
         return ResponseDTO.of("success");
     }
 
+    /**
+     * 질문 재성성
+     */
+    @PostMapping("/api/v1/insights/{id}/questions/re-generate")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseDTO<?> regenerateQuestions(@PathVariable("id") long insightId,
+                                              @AuthenticationPrincipal CustomUserDetails userDetails) {
+        questionsFacadeService.regenerateQuestions(insightId, userDetails.getUuid());
+        return ResponseDTO.of("success");
+    }
 }
