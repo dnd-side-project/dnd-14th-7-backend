@@ -36,10 +36,10 @@ public interface InsightRepository extends JpaRepository<Insight, Long> {
 
 
     // 태그별 인사이트 전체 조회 카운트
-    @Query("select count(distinct i) from Insight i join i.insightTags it where i.user.id = :userId and i.trash = false")
+    @Query("select count(i) from Insight i where i.user.id = :userId and i.trash = false")
     int countByUserId(@Param("userId") long userId);
 
     // 인사이트 전체 조회 카운트
-    @Query("select count(distinct i) from Insight i join i.insightTags it where i.user.id = :userId and i.trash = false and it.tagEntity.id = :tagId")
+    @Query("select count(i) from Insight i join i.insightTags it where i.user.id = :userId and i.trash = false and it.tagEntity.id = :tagId")
     int countByUserIdAndTagId(@Param("userId") long userId, @Param("tagId") long tagId);
 }
