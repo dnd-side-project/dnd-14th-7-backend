@@ -7,15 +7,19 @@ import com.dnd.ahaive.domain.insight.dto.request.AnswerToInsightRequest;
 import com.dnd.ahaive.domain.insight.dto.request.InsightCreateRequest;
 import com.dnd.ahaive.domain.insight.dto.request.PieceCreateRequest;
 import com.dnd.ahaive.domain.insight.dto.request.PieceUpdateRequest;
+import com.dnd.ahaive.domain.insight.dto.response.AiInsightCandidateResponse;
+import com.dnd.ahaive.domain.insight.dto.response.InsightCandidateReGenResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightCreateResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightDetailResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightListResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightPieceResponse;
 import com.dnd.ahaive.domain.insight.entity.Insight;
+import com.dnd.ahaive.domain.insight.entity.InsightCandidate;
 import com.dnd.ahaive.domain.insight.entity.InsightGenerationType;
 import com.dnd.ahaive.domain.insight.entity.InsightPiece;
 import com.dnd.ahaive.domain.insight.entity.InsightSortType;
 import com.dnd.ahaive.domain.insight.exception.InsightNotFoundException;
+import com.dnd.ahaive.domain.insight.repository.InsightCandidateRepository;
 import com.dnd.ahaive.domain.insight.repository.InsightPieceRepository;
 import com.dnd.ahaive.domain.insight.exception.InsightAccessDeniedException;
 import com.dnd.ahaive.domain.insight.repository.InsightRepository;
@@ -73,6 +77,7 @@ public class InsightService {
 
   private final ClaudeAiClient claudeAiClient;
   private final ObjectMapper objectMapper;
+  private final InsightCandidateRepository insightCandidateRepository;
 
   @Transactional
   public InsightCreateResponse createInsight(InsightCreateRequest insightCreateRequest, String uuid) {
@@ -345,5 +350,44 @@ public class InsightService {
     }
 
     return InsightListResponse.of(insights, page, size, totalElements, totalPages);
+  }
+
+  @Transactional
+  public InsightCandidateReGenResponse reGenerateInsightCandidates(Long insightId, String uuid) {
+    User user = userRepository.findByUserUuid(uuid).orElseThrow(
+        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND)
+    );
+
+    // 인사이트 존재 여부 및 조회 권한 검증
+    Insight insight = getValidatedInsight(insightId, uuid);
+
+    try {
+      // 첫 생각에 해당하는 인사이트 조각 조회
+      InsightPiece insightPiece = insightPieceRepository.findByInsightIdAndType(insightId, InsightGenerationType.INIT)
+          .orElseThrow(() -> new InsightNotFoundException(ErrorCode.INSIGHT_NOT_FOUND));
+
+      // 해당 인사이트 조각에 대한 최신 인사이트 후보 3개 조회 (이전 버전과 다르게 생성하기 위함)
+      List<InsightCandidate> latestCandidates = insightCandidateRepository.findTop3ByInsightPieceIdOrderByCreatedAtDesc(insightPiece.getId());
+
+      // 첫 생각을 기반으로 AI가 새로운 인사이트 후보 3개 생성
+      String aiResponse = claudeAiClient.sendMessage(ClaudeAiPrompt.INIT_THOUGHT_TO_INSIGHT_CANDIDATE_PROMPT(insight.getInitThought(), latestCandidates));
+      AiInsightCandidateResponse aiCandidateResponse = objectMapper.readValue(aiResponse, AiInsightCandidateResponse.class);
+
+      // 해당 인사이트 조각에 대한 기존 후보들의 버전 중 최댓값 조회
+      Long maxVersion = insightCandidateRepository.findMaxVersionByInsightPieceId(insightPiece.getId());
+
+      if(maxVersion == null) {
+        maxVersion = 0L;
+      }
+
+      List<InsightCandidate> insightCandidates = InsightCandidate.from(aiCandidateResponse, insightPiece, maxVersion + 1);
+
+      insightCandidateRepository.saveAll(insightCandidates);
+
+      return InsightCandidateReGenResponse.of(insight, insightCandidates);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
   }
 }

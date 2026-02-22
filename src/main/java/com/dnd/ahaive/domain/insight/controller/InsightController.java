@@ -3,6 +3,7 @@ package com.dnd.ahaive.domain.insight.controller;
 import com.dnd.ahaive.domain.insight.dto.request.AnswerToInsightRequest;
 import com.dnd.ahaive.domain.insight.dto.request.InsightCreateRequest;
 import com.dnd.ahaive.domain.insight.dto.request.PieceCreateRequest;
+import com.dnd.ahaive.domain.insight.dto.response.InsightCandidateReGenResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightCreateResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightDetailResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightListResponse;
@@ -100,6 +101,14 @@ public class InsightController {
     InsightListResponse insightListResponse = insightService.getInsights(page, size, sort, tag, customUserDetails.getUuid());
 
     return ResponseDTO.of(insightListResponse, "인사이트 조회에 성공하였습니다.");
+  }
+
+  @PostMapping("/{insightId}/re-generate")
+  public ResponseDTO<InsightCandidateReGenResponse> reGenerateInsightCandidates(@PathVariable Long insightId,
+      @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    InsightCandidateReGenResponse response = insightService.reGenerateInsightCandidates(insightId, customUserDetails.getUuid());
+
+    return ResponseDTO.of(response, "인사이트 후보 재생성에 성공하였습니다.");
   }
 
 
