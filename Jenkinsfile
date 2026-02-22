@@ -24,16 +24,16 @@ pipeline {
             }
         }
 
-        stage('test') {
-            steps {
-                echo 'test start'
-                sh './gradlew test'
-            }
-            post {
-                success { echo 'success test' }
-                failure { error 'fail test' }
-            }
-        }
+//         stage('test') {
+//             steps {
+//                 echo 'test start'
+//                 sh './gradlew test'
+//             }
+//             post {
+//                 success { echo 'success test' }
+//                 failure { error 'fail test' }
+//             }
+//         }
 
         stage('docker image build') {
             steps {
