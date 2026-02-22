@@ -37,5 +37,4 @@ public class InsightPieceController {
 
     return ResponseDTO.of("인사이트 조각 삭제에 성공하였습니다.");
   }
-
 }

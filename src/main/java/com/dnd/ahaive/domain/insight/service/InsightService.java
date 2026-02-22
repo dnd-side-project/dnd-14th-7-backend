@@ -9,10 +9,12 @@ import com.dnd.ahaive.domain.insight.dto.request.PieceCreateRequest;
 import com.dnd.ahaive.domain.insight.dto.request.PieceUpdateRequest;
 import com.dnd.ahaive.domain.insight.dto.response.InsightCreateResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightDetailResponse;
+import com.dnd.ahaive.domain.insight.dto.response.InsightListResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightPieceResponse;
 import com.dnd.ahaive.domain.insight.entity.Insight;
 import com.dnd.ahaive.domain.insight.entity.InsightGenerationType;
 import com.dnd.ahaive.domain.insight.entity.InsightPiece;
+import com.dnd.ahaive.domain.insight.entity.InsightSortType;
 import com.dnd.ahaive.domain.insight.exception.InsightNotFoundException;
 import com.dnd.ahaive.domain.insight.repository.InsightPieceRepository;
 import com.dnd.ahaive.domain.insight.exception.InsightAccessDeniedException;
@@ -27,11 +29,13 @@ import com.dnd.ahaive.domain.question.repository.QuestionRepository;
 import com.dnd.ahaive.domain.tag.dto.response.AiTagResponse;
 import com.dnd.ahaive.domain.tag.entity.InsightTag;
 import com.dnd.ahaive.domain.tag.entity.TagEntity;
+import com.dnd.ahaive.domain.tag.exception.TagNotFoundException;
 import com.dnd.ahaive.domain.tag.repository.InsightTagRepository;
 import com.dnd.ahaive.domain.tag.repository.TagEntityRepository;
 import com.dnd.ahaive.domain.user.entity.User;
 import com.dnd.ahaive.domain.user.repository.UserRepository;
 import com.dnd.ahaive.global.exception.ErrorCode;
+import com.dnd.ahaive.global.exception.InvalidInputValueException;
 import com.dnd.ahaive.global.security.exception.UserNotFoundException;
 import com.dnd.ahaive.infra.claude.ClaudeAiClient;
 import com.dnd.ahaive.infra.claude.prompt.ClaudeAiPrompt;
@@ -41,12 +45,14 @@ import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -295,5 +301,49 @@ public class InsightService {
         .orElseThrow(() -> new InsightNotFoundException(ErrorCode.INSIGHT_NOT_FOUND));
 
     insightPieceRepository.delete(insightPiece);
+  }
+
+  @Transactional
+  public InsightListResponse getInsights(int page, int size, InsightSortType sort, Long tag, String uuid) {
+
+    User user = userRepository.findByUserUuid(uuid).orElseThrow(
+        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND)
+    );
+
+
+    List<Insight> insights = new ArrayList<>();
+    int totalPages;
+    int totalElements;
+
+    Pageable pageable = PageRequest.of(page - 1, size,
+        sort == InsightSortType.LATEST
+    ? Sort.by(Sort.Direction.DESC, "createdAt")
+        : Sort.by(Sort.Direction.DESC, "view"));
+
+    if(tag == null) {
+
+      insights = insightRepository.findAllByUserIdWithPiecesAndTags(user.getId(), pageable);
+      totalElements = insightRepository.countByUserId(user.getId());
+      totalPages = (int) Math.ceil((double) totalElements / size);
+
+    } else {
+
+      // 해당 태그가 존재하는지 확인
+      tagEntityRepository.findById(tag).orElseThrow(
+          () -> new TagNotFoundException(ErrorCode.TAG_NOT_FOUND)
+      );
+
+      insights = insightRepository.findAllByUserIdAndTagIdWithPiecesAndTags(user.getId(), tag, pageable);
+      totalElements = insightRepository.countByUserIdAndTagId(user.getId(), tag);
+      totalPages = (int) Math.ceil((double) totalElements / size);
+    }
+
+
+    // 조회하려는 페이지 번호가 총 페이지 수보다 큰 경우 예외 처리
+    if(totalPages < page) {
+      throw new InvalidInputValueException(ErrorCode.INVALID_INPUT_VALUE);
+    }
+
+    return InsightListResponse.of(insights, page, size, totalElements, totalPages);
   }
 }

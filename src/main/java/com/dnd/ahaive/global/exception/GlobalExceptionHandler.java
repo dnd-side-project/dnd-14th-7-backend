@@ -9,6 +9,7 @@ import com.dnd.ahaive.domain.history.exception.AlreadyConvertedAnswerException;
 import com.dnd.ahaive.domain.insight.exception.InsightAccessDeniedException;
 import com.dnd.ahaive.domain.insight.exception.InsightNotFoundException;
 import com.dnd.ahaive.domain.question.exception.AnswerNotFoundException;
+import com.dnd.ahaive.domain.tag.exception.TagNotFoundException;
 import com.dnd.ahaive.global.common.response.ResponseDTO;
 import com.dnd.ahaive.global.security.exception.UserNotFoundException;
 import com.dnd.ahaive.infra.claude.exception.AiCallException;
@@ -72,6 +73,21 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     log.error("AI 호출 중 예외가 발생했습니다.", e);
     return ResponseEntity
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(ResponseDTO.of(e.getErrorCode()));
+  }
+
+  @ExceptionHandler(TagNotFoundException.class)
+  public ResponseEntity<ResponseDTO> handleTagNotFoundException(TagNotFoundException e) {
+    log.error("태그를 찾을 수 없습니다.", e);
+    return ResponseEntity
+        .status(HttpStatus.NOT_FOUND)
+        .body(ResponseDTO.of(e.getErrorCode()));
+  }
+
+  @ExceptionHandler(InvalidInputValueException.class)
+  public ResponseEntity<ResponseDTO> handleInvalidInputValue(InvalidInputValueException e) {
+    log.warn("입력값 검증 실패: {}", e.getMessage());
+    return ResponseEntity.status(e.getErrorCode().getActualStatusCode())
         .body(ResponseDTO.of(e.getErrorCode()));
   }
 
