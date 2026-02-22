@@ -310,12 +310,10 @@ public class InsightService {
         () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND)
     );
 
-    // 해당 태그가 존재하는지 확인
-    tagEntityRepository.findById(tag).orElseThrow(
-        () -> new TagNotFoundException(ErrorCode.TAG_NOT_FOUND)
-    );
 
     List<Insight> insights = new ArrayList<>();
+    int totalPages;
+    int totalElements;
 
     Pageable pageable = PageRequest.of(page - 1, size,
         sort == InsightSortType.LATEST
@@ -323,11 +321,23 @@ public class InsightService {
         : Sort.by(Sort.Direction.DESC, "view"));
 
     if(tag == null) {
+
       insights = insightRepository.findAllByUserIdWithPiecesAndTags(user.getId(), pageable);
+      totalElements = insightRepository.countByUserId(user.getId());
+      totalPages = (int) Math.ceil((double) totalElements / size);
+
     } else {
+
+      // 해당 태그가 존재하는지 확인
+      tagEntityRepository.findById(tag).orElseThrow(
+          () -> new TagNotFoundException(ErrorCode.TAG_NOT_FOUND)
+      );
+
       insights = insightRepository.findAllByUserIdAndTagIdWithPiecesAndTags(user.getId(), tag, pageable);
+      totalElements = insightRepository.countByUserIdAndTagId(user.getId(), tag);
+      totalPages = (int) Math.ceil((double) totalElements / size);
     }
 
-
+    return InsightListResponse.of(insights, page, size, totalElements, totalPages);
   }
 }
