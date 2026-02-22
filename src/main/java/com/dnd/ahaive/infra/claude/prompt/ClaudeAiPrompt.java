@@ -53,6 +53,18 @@ public class ClaudeAiPrompt {
         """.formatted(initThought);
   }
 
+  public static String INIT_THOUGHT_TO_INSIGHT_CANDIDATE_PROMPT(String initThought) {
+    return """
+        다음 메모를 바탕으로 핵심 인사이트 후보 3개를 생성해줘. 마크다운 코드블록 없이 순수 JSON 형식으로만 출력하고 부가 설명은 절대 포함하지 마.
+        
+        예시:
+        메모: 로그 안남겨서 디버깅이 너무 힘들었다
+        출력: {"insightCandidates": ["충분한 로그는 문제 해결을 빠르게 한다.", "로그가 없으면 문제 원인 파악이 어려워진다.", "개발 초기부터 로그 전략을 세우는 것이 중요하다."]}
+        
+        메모: %s
+        """.formatted(initThought);
+  }
+
   public static String ANSWER_TO_INSIGHT_PROMPT(String answer){
     return """
         다음 답변을 핵심 인사이트 한 문장으로 변환해줘. 인사이트 문장만 출력하고 "인사이트:" 같은 접두사나 부가 설명은 절대 포함하지 마.

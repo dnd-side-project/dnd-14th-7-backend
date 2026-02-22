@@ -7,6 +7,7 @@ import com.dnd.ahaive.domain.insight.dto.request.AnswerToInsightRequest;
 import com.dnd.ahaive.domain.insight.dto.request.InsightCreateRequest;
 import com.dnd.ahaive.domain.insight.dto.request.PieceCreateRequest;
 import com.dnd.ahaive.domain.insight.dto.request.PieceUpdateRequest;
+import com.dnd.ahaive.domain.insight.dto.response.InsightCandidateReGenResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightCreateResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightDetailResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightListResponse;
@@ -345,5 +346,18 @@ public class InsightService {
     }
 
     return InsightListResponse.of(insights, page, size, totalElements, totalPages);
+  }
+
+  public InsightCandidateReGenResponse reGenerateInsightCandidates(Long insightId, String uuid) {
+    User user = userRepository.findByUserUuid(uuid).orElseThrow(
+        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND)
+    );
+
+    // 인사이트 존재 여부 및 조회 권한 검증
+    Insight insight = getValidatedInsight(insightId, uuid);
+
+    // 첫 생각을 기반으로 AI가 새로운 인사이트 후보 생성
+
+
   }
 }
