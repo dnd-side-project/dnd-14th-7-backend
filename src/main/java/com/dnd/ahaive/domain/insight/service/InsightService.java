@@ -35,6 +35,7 @@ import com.dnd.ahaive.domain.tag.repository.TagEntityRepository;
 import com.dnd.ahaive.domain.user.entity.User;
 import com.dnd.ahaive.domain.user.repository.UserRepository;
 import com.dnd.ahaive.global.exception.ErrorCode;
+import com.dnd.ahaive.global.exception.InvalidInputValueException;
 import com.dnd.ahaive.global.security.exception.UserNotFoundException;
 import com.dnd.ahaive.infra.claude.ClaudeAiClient;
 import com.dnd.ahaive.infra.claude.prompt.ClaudeAiPrompt;
@@ -44,7 +45,6 @@ import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.stream.Collectors;
@@ -338,8 +338,10 @@ public class InsightService {
       totalPages = (int) Math.ceil((double) totalElements / size);
     }
 
-    if(totalPages < page) {
 
+    // 조회하려는 페이지 번호가 총 페이지 수보다 큰 경우 예외 처리
+    if(totalPages < page) {
+      throw new InvalidInputValueException(ErrorCode.INVALID_INPUT_VALUE);
     }
 
     return InsightListResponse.of(insights, page, size, totalElements, totalPages);
