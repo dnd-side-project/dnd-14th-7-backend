@@ -1,9 +1,10 @@
 pipeline {
     agent any
     environment {
-        IMAGE_NAME = 'ahaive-backend'
+        IMAGE_NAME = 'dnd/backend/ahaive-backend'
 
-        ECR_PATH = '407401394535.dkr.ecr.ap-northeast-2.amazonaws.com/dnd/backend'
+        ECR_REGISTRY = '407401394535.dkr.ecr.ap-northeast-2.amazonaws.com'
+        ECR_PATH = "${ECR_REGISTRY}/${IMAGE_NAME}"
         REGION = 'ap-northeast-2'
 
         SERVICE_EC2_IP = '10.0.6.196'
@@ -24,22 +25,12 @@ pipeline {
             }
         }
 
-//         stage('test') {
-//             steps {
-//                 echo 'test start'
-//                 sh './gradlew test'
-//             }
-//             post {
-//                 success { echo 'success test' }
-//                 failure { error 'fail test' }
-//             }
-//         }
 
         stage('docker image build') {
             steps {
                 echo 'docker image build start'
-                sh 'docker build -t ${ECR_PATH}/${IMAGE_NAME}:${BUILD_NUMBER} .'
-                sh 'docker tag ${ECR_PATH}/${IMAGE_NAME}:${BUILD_NUMBER} ${ECR_PATH}/${IMAGE_NAME}:latest'
+                sh 'docker build -t ${ECR_PATH}:${BUILD_NUMBER} .'
+                sh 'docker tag ${ECR_PATH}:${BUILD_NUMBER} ${ECR_PATH}:latest'
 
             }
             post {
@@ -51,9 +42,9 @@ pipeline {
         stage('docker image push') {
             steps {
                 script {
-                    sh 'aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ECR_PATH}'
-                    sh 'docker push ${ECR_PATH}/${IMAGE_NAME}:${BUILD_NUMBER}'
-                    sh 'docker push ${ECR_PATH}/${IMAGE_NAME}:latest'
+                    sh 'aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}'
+                    sh 'docker push ${ECR_PATH}:${BUILD_NUMBER}'
+                    sh 'docker push ${ECR_PATH}:latest'
                 }
             }
             post {
@@ -70,10 +61,10 @@ pipeline {
                                 ssh -v -o StrictHostKeyChecking=no ${SERVICE_EC2_USER}@${SERVICE_EC2_IP} '
                                     # ECR 로그인
                                     aws ecr get-login-password --region ap-northeast-2 | \
-                                    docker login --username AWS --password-stdin ${ECR_PATH}
+                                    docker login --username AWS --password-stdin ${ECR_REGISTRY}
 
                                     # 새 이미지 pull
-                                    docker pull ${ECR_PATH}/${IMAGE_NAME}:${BUILD_NUMBER}
+                                    docker pull ${ECR_PATH}:${BUILD_NUMBER}
 
                                     # docker-compose 이미지 태그 업데이트 후 재시작
                                     cd /home/ubuntu/app
