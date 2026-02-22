@@ -1,5 +1,8 @@
 package com.dnd.ahaive.infra.claude.prompt;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.Getter;
 
 @Getter
@@ -66,4 +69,26 @@ public class ClaudeAiPrompt {
         """.formatted(answer);
   }
 
+  public static String REGENERATE_QUESTIONS_PROMPT(String insightTitle, List<String> existingQuestions) {
+    String existingQuestionsText = existingQuestions.isEmpty()
+            ? "없음"
+            : IntStream.range(0, existingQuestions.size())
+                    .mapToObj(i -> (i + 1) + ". " + existingQuestions.get(i))
+                    .collect(Collectors.joining("\n"));
+
+    return """
+      다음 인사이트 제목을 바탕으로 더 깊이 생각해보거나 학습해볼 만한 질문 3개를 생성해줘.
+      기존 질문과 중복되는 질문은 절대 포함하지 마.
+      마크다운 코드블록 없이 순수 JSON 형식으로만 출력하고 부가 설명은 절대 포함하지 마.
+    
+      예시:
+      인사이트 제목: 서버 로그의 중요성
+      기존 질문: 없음
+      출력: {"questions": ["로그 레벨은 각각 어떤 상황에서 사용하나요?", "분산 시스템에서 로그를 효과적으로 수집하는 방법은?", "로그 과부하를 방지하면서 충분한 정보를 남기려면?"]}
+    
+      인사이트 제목: %s
+      기존 질문:
+      %s
+    """.formatted(insightTitle, existingQuestionsText);
+  }
 }
