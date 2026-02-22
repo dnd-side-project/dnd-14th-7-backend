@@ -2,7 +2,6 @@ package com.dnd.ahaive.domain.insight.entity;
 
 import com.dnd.ahaive.domain.tag.entity.InsightTag;
 import com.dnd.ahaive.domain.user.entity.User;
-import com.dnd.ahaive.global.common.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -17,7 +16,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 
 @Entity
 @Getter
