@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,4 +30,23 @@ public class InsightCandidate extends BaseEntity {
     private String content;
 
     private long version;
+
+    public void versionUp() {
+        this.version++;
+    }
+
+    @Builder
+    private InsightCandidate(InsightPiece insightPiece, String content, long version) {
+        this.insightPiece = insightPiece;
+        this.content = content;
+        this.version = version;
+    }
+
+    public static InsightCandidate of(InsightPiece insightPiece, String content, long version) {
+        return InsightCandidate.builder()
+            .insightPiece(insightPiece)
+            .content(content)
+            .version(version)
+            .build();
+    }
 }
