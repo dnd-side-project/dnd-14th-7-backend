@@ -1,5 +1,6 @@
 package com.dnd.ahaive.domain.insight.entity;
 
+import com.dnd.ahaive.domain.tag.entity.InsightTag;
 import com.dnd.ahaive.domain.user.entity.User;
 import com.dnd.ahaive.global.common.BaseEntity;
 import jakarta.persistence.Entity;
@@ -8,7 +9,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,6 +42,13 @@ public class Insight {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "insight")
+    private List<InsightPiece> insightPieces = new ArrayList<>();
+
+    @OneToMany(mappedBy = "insight")
+    private List<InsightTag> insightTags = new ArrayList<>();
+
 
     public void changeUser(User user) {
         this.user = user;
