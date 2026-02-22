@@ -1,5 +1,6 @@
 package com.dnd.ahaive.domain.insight.entity;
 
+import com.dnd.ahaive.domain.insight.dto.response.AiInsightCandidateResponse;
 import com.dnd.ahaive.global.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -48,5 +50,11 @@ public class InsightCandidate extends BaseEntity {
             .content(content)
             .version(version)
             .build();
+    }
+
+    public static List<InsightCandidate> from(AiInsightCandidateResponse response, InsightPiece insightPiece, long version) {
+        return response.getInsightCandidates().stream()
+            .map(content -> InsightCandidate.of(insightPiece, content, version))
+            .toList();
     }
 }
