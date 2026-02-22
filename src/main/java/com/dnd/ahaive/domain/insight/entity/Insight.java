@@ -10,8 +10,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,10 +42,10 @@ public class Insight {
     private User user;
 
     @OneToMany(mappedBy = "insight")
-    private List<InsightPiece> insightPieces = new ArrayList<>();
+    private Set<InsightPiece> insightPieces = new HashSet<>();
 
     @OneToMany(mappedBy = "insight")
-    private List<InsightTag> insightTags = new ArrayList<>();
+    private Set<InsightTag> insightTags = new HashSet<>();
 
 
     public void changeUser(User user) {

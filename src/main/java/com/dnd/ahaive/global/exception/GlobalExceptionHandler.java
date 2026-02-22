@@ -84,6 +84,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         .body(ResponseDTO.of(e.getErrorCode()));
   }
 
+  @ExceptionHandler(InvalidInputValueException.class)
+  public ResponseEntity<ResponseDTO> handleInvalidInputValue(InvalidInputValueException e) {
+    log.warn("입력값 검증 실패: {}", e.getMessage());
+    return ResponseEntity.status(e.getErrorCode().getActualStatusCode())
+        .body(ResponseDTO.of(e.getErrorCode()));
+  }
+
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ResponseDTO> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
     log.warn("입력값 검증 실패: {}", e.getBindingResult().getFieldErrors());

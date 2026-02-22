@@ -23,7 +23,7 @@ public interface InsightRepository extends JpaRepository<Insight, Long> {
         + "join fetch i.insightTags it "
         + "join fetch it.tagEntity "
         + "where i.user.id = :userId and i.trash = false "
-        + "and it.tagEntity.id = :tagId")
+        + "and i.id in (select i2.id from Insight i2 join i2.insightTags it2 where it2.tagEntity.id = :tagId)")
     List<Insight> findAllByUserIdAndTagIdWithPiecesAndTags(@Param("userId") long userId, @Param("tagId") long tagId, Pageable pageable);
 
     // 인사이트 전체 조회

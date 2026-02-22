@@ -338,6 +338,10 @@ public class InsightService {
       totalPages = (int) Math.ceil((double) totalElements / size);
     }
 
+    if(totalPages < page) {
+
+    }
+
     return InsightListResponse.of(insights, page, size, totalElements, totalPages);
   }
 }
