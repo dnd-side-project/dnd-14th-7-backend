@@ -33,5 +33,5 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     int updateQuestionStatusByIdIn(@Param("status") QuestionStatus status, @Param("ids") List<Long> questionIds);
 
     @Query("SELECT MAX(q.version) FROM Question q WHERE q.insight.id = :insightId")
-    Optional<Integer> findMaxVersionByInsightId(@Param("insightId") Long insightId);
+    Optional<Long> findMaxVersionByInsightId(@Param("insightId") Long insightId);
 }

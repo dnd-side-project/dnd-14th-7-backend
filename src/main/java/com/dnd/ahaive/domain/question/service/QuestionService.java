@@ -13,7 +13,6 @@ import com.dnd.ahaive.domain.question.entity.QuestionStatus;
 import com.dnd.ahaive.domain.question.repository.AnswerRepository;
 import com.dnd.ahaive.domain.question.repository.QuestionRepository;
 import com.dnd.ahaive.domain.question.service.dto.QuestionContentDto;
-import com.dnd.ahaive.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -85,14 +84,15 @@ public class QuestionService {
         Insight managedInsight = insightRepository.findById(insight.getId())
                 .orElseThrow(() -> new EntityNotFoundException("인사이트가 존재하지 않습니다. insightId: " + insight.getId()));
 
-        // 현재 인사이트 보관
+        // 현재 질문 보관
         List<Long> currentQuestionIds = currentQuestionContents.stream().map(QuestionContentDto::questionId).toList();
-        questionRepository.updateQuestionStatusByIdIn(QuestionStatus.ARCHIVED, currentQuestionIds);
-
+        if (!currentQuestionIds.isEmpty()) {
+            questionRepository.updateQuestionStatusByIdIn(QuestionStatus.ARCHIVED, currentQuestionIds);
+        }
         // 다음 버전 계산
-        int nextVersion = questionRepository.findMaxVersionByInsightId(insight.getId()).orElse(0) + 1;
+        long nextVersion = questionRepository.findMaxVersionByInsightId(insight.getId()).orElse(0L) + 1L;
 
-        // 새로운 인사이트 저장
+        // 새로운 질문 저장
         List<Question> newQuestions = collectedQuestionContents.stream()
                 .map(content ->
                         Question.of(
