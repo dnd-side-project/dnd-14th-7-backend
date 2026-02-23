@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface InsightPieceRepository extends JpaRepository<InsightPiece, Long> {
   List<InsightPiece> findAllByInsightIdOrderByCreatedAtAsc(Long insightId);
@@ -13,6 +14,10 @@ public interface InsightPieceRepository extends JpaRepository<InsightPiece, Long
   @Query("select ip from InsightPiece ip where ip.insight.id = :insightId and ip.createdType = :type")
   Optional<InsightPiece> findByInsightIdAndType(Long insightId, InsightGenerationType type);
 
-
+  @Query("SELECT ip FROM InsightPiece ip " +
+          "WHERE ip.insight.id IN :insightIds " +
+          "AND ip.createdType = :generationType")
+  List<InsightPiece> findInitPiecesByInsightIds(@Param("insightIds") List<Long> insightIds,
+                                                @Param("generationType") InsightGenerationType generationType);
 
 }
