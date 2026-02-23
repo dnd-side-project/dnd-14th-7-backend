@@ -7,14 +7,15 @@ pipeline {
         ECR_PATH = "${ECR_REGISTRY}/${IMAGE_NAME}"
         REGION = 'ap-northeast-2'
 
-        SERVICE_EC2_IP = '10.0.6.196'
+//         SERVICE_EC2_IP = '10.0.6.196'
+        SERVICE_EC2_IP = '10.0.2.26'
         SERVICE_EC2_USER = 'ubuntu'
     }
     stages {
         stage('Checkout Github') {
             steps {
                 checkout scmGit(
-                    branches: [[name: '*/feature-jenkins']],
+                    branches: [[name: '*/develop']],
                     extensions: [],
                     userRemoteConfigs: [[credentialsId: 'github-credential', url: 'https://github.com/dnd-side-project/dnd-14th-7-backend.git']]
                 )
