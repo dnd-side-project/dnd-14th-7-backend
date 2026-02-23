@@ -11,6 +11,7 @@ public record AnswerResponse(
          long questionId,
          String questionContent,
         String answerContent,
+        boolean isConverted,
         LocalDateTime createdDate
 ) {
 
@@ -22,6 +23,7 @@ public record AnswerResponse(
                 .questionId(question.getId())
                 .questionContent(question.getContent())
                 .answerContent(answer.getContent())
+                .isConverted(answer.isConverted())
                 .createdDate(answer.getCreatedAt())
                 .build();
     }
