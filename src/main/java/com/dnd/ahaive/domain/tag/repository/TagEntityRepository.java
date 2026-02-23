@@ -18,7 +18,7 @@ public interface TagEntityRepository extends JpaRepository<TagEntity, Long> {
   Optional<TagEntity> findByIdAndUser(Long tagId, User user);
 
   @Query("SELECT new com.dnd.ahaive.domain.search.service.dto.TagSearchDto(t.id, t.tagName, COUNT(it.id)) " +
-          "FROM Tag t JOIN InsightTag it ON it.tagEntity = t " +
+          "FROM TagEntity t JOIN InsightTag it ON it.tagEntity = t " +
           "WHERE t.user.userUuid = :uuid " +
           "AND t.tagName LIKE %:searchTerm% " +
           "GROUP BY t.id, t.tagName")
