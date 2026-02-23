@@ -1,6 +1,7 @@
 package com.dnd.ahaive.domain.insight.repository;
 
 import com.dnd.ahaive.domain.insight.entity.Insight;
+import com.dnd.ahaive.domain.insight.entity.InsightGenerationType;
 import com.dnd.ahaive.domain.user.entity.User;
 import java.util.List;
 import java.util.Optional;
@@ -42,4 +43,17 @@ public interface InsightRepository extends JpaRepository<Insight, Long> {
     // 인사이트 전체 조회 카운트
     @Query("select count(i) from Insight i join i.insightTags it where i.user.id = :userId and i.trash = false and it.tagEntity.id = :tagId")
     int countByUserIdAndTagId(@Param("userId") long userId, @Param("tagId") long tagId);
+
+    @Query("SELECT DISTINCT i FROM Insight i " +
+            "JOIN InsightPiece ip ON ip.insight = i " +
+            "WHERE i.user.userUuid = :uuid " +
+            "AND i.trash = false " +
+            "AND (i.title LIKE %:searchTerm% " +
+            "OR i.initThought LIKE %:searchTerm% " +
+            "OR (ip.createdType = :generationType AND ip.content LIKE %:searchTerm%)) " +
+            "ORDER BY i.createdAt DESC")
+    List<Insight> searchInsights(@Param("uuid") String uuid,
+                                 @Param("searchTerm") String searchTerm,
+                                 @Param("generationType") InsightGenerationType generationType,
+                                 Pageable pageable);
 }
