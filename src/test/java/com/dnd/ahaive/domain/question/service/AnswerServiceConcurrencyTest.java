@@ -21,6 +21,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,8 @@ class AnswerServiceConcurrencyTest {
     InsightRepository insightRepository;
     @Autowired
     QuestionRepository questionRepository;
+    @Autowired
+    private AnswerRepository answerRepository;
 
     @Autowired
     private AnswerService answerService;
@@ -45,8 +48,6 @@ class AnswerServiceConcurrencyTest {
     User user;
     Insight insight;
     Question question;
-    @Autowired
-    private AnswerRepository answerRepository;
 
     @BeforeEach
     void setup() {
@@ -57,6 +58,14 @@ class AnswerServiceConcurrencyTest {
         userRepository.save(user);
         insightRepository.save(insight);
         questionRepository.saveAndFlush(question);
+    }
+
+    @AfterEach
+    void teardown() {
+        answerRepository.deleteAllInBatch();
+        questionRepository.deleteAllInBatch();
+        insightRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
     }
 
     @Test
