@@ -14,7 +14,7 @@ pipeline {
         stage('Checkout Github') {
             steps {
                 checkout scmGit(
-                    branches: [[name: '*/main']],
+                    branches: [[name: '*/feature-jenkins']],
                     extensions: [],
                     userRemoteConfigs: [[credentialsId: 'github-credential', url: 'https://github.com/dnd-side-project/dnd-14th-7-backend.git']]
                 )
