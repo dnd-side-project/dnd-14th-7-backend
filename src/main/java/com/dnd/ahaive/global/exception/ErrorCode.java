@@ -93,6 +93,7 @@ public enum ErrorCode {
     INSIGHT_NOT_FOUND(404, "INSIGHT_NOT_FOUND", "해당 인사이트를 찾을 수 없습니다."),
     ANSWER_NOT_FOUND(404, "ANSWER_NOT_FOUND", "해당 답변을 찾을 수 없습니다."),
     TAG_NOT_FOUND(404, "TAG_NOT_FOUND", "해당 태그를 찾을 수 없습니다."),
+    PIECE_NOT_FOUND(404, "PIECE_NOT_FOUND", "해당 인사이트 조각을 찾을 수 없습니다."),
 
 
     // 405 Method Not Allowed
