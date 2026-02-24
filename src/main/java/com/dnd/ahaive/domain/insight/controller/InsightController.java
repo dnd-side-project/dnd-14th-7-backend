@@ -13,11 +13,13 @@ import com.dnd.ahaive.domain.insight.service.InsightService;
 import com.dnd.ahaive.global.common.response.ResponseDTO;
 import com.dnd.ahaive.global.security.core.CustomUserDetails;
 import jakarta.validation.Valid;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -109,6 +111,15 @@ public class InsightController {
     InsightCandidateReGenResponse response = insightService.reGenerateInsightCandidates(insightId, customUserDetails.getUuid());
 
     return ResponseDTO.of(response, "인사이트 후보 재생성에 성공하였습니다.");
+  }
+
+  @PatchMapping("/{insightId}/trash")
+  public ResponseDTO<?> moveInsightToTrash(
+      @PathVariable("insightId") Long insightId,
+      @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    insightService.moveInsightToTrash(insightId, customUserDetails.getUuid());
+
+    return ResponseDTO.of("인사이트 휴지통 이동에 성공하였습니다.");
   }
 
 
