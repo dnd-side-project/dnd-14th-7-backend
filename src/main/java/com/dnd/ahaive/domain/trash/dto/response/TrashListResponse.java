@@ -2,7 +2,7 @@ package com.dnd.ahaive.domain.trash.dto.response;
 
 import com.dnd.ahaive.domain.insight.entity.Insight;
 import com.dnd.ahaive.domain.insight.entity.InsightGenerationType;
-import com.dnd.ahaive.domain.tag.entity.Tag;
+import com.dnd.ahaive.domain.trash.exception.PieceNotFoundException;
 import com.dnd.ahaive.global.exception.ErrorCode;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,7 +43,7 @@ public class TrashListResponse {
             .confirmedContent(insight.getInsightPieces().stream()
                 .filter(piece -> piece.getCreatedType().equals(InsightGenerationType.INIT))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException(ErrorCode.INTERNAL_SERVER_ERROR))
+                .orElseThrow(() -> new PieceNotFoundException(ErrorCode.PIECE_NOT_FOUND))
                 .toString())
             .tags(insight.getInsightTags().stream()
                 .map(tag -> TagResponse.builder()
