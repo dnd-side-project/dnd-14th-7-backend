@@ -122,6 +122,15 @@ public class InsightController {
     return ResponseDTO.of("인사이트 휴지통 이동에 성공하였습니다.");
   }
 
+  @PatchMapping("/{insightId}/restore")
+  public ResponseDTO<?> restoreInsightFromTrash(
+      @PathVariable("insightId") Long insightId,
+      @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    insightService.restoreInsightFromTrash(insightId, customUserDetails.getUuid());
+
+    return ResponseDTO.of("인사이트 복원에 성공하였습니다.");
+  }
+
 
 
 }

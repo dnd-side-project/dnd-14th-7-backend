@@ -7,6 +7,7 @@ import com.dnd.ahaive.global.security.core.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,9 +24,5 @@ public class TrashController {
     TrashListResponse trashListResponse = trashService.getTrashInsights(customUserDetails.getUuid());
 
     return ResponseDTO.of(trashListResponse, "휴지통 전체 조회에 성공하였습니다.");
-
   }
-
-
-
 }

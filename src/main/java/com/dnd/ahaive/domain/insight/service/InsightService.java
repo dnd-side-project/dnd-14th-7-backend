@@ -402,4 +402,16 @@ public class InsightService {
 
     insight.moveToTrash();
   }
+
+  @Transactional
+  public void restoreInsightFromTrash(Long insightId, String uuid) {
+    User user = userRepository.findByUserUuid(uuid).orElseThrow(
+        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND)
+    );
+
+    // 인사이트 존재 여부 및 조회 권한 검증
+    Insight insight = getValidatedInsight(insightId, uuid);
+
+    insight.restoreFromTrash();
+  }
 }
