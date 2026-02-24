@@ -35,6 +35,15 @@ public interface InsightRepository extends JpaRepository<Insight, Long> {
         + "where i.user.id = :userId and i.trash = false")
     List<Insight> findAllByUserIdWithPiecesAndTags(@Param("userId") long userId, Pageable pageable);
 
+    // 인사이트(휴지통) 전체 조회
+    @Query("select distinct i from Insight i "
+        + "join fetch i.insightPieces "
+        + "join fetch i.insightTags it "
+        + "join fetch it.tagEntity "
+        + "where i.user.id = :userId and i.trash = true "
+        + "order by i.trashedAt desc")
+    List<Insight> findAllTrashByUserIdWithPiecesAndTags(@Param("userId") long userId);
+
 
     // 태그별 인사이트 전체 조회 카운트
     @Query("select count(i) from Insight i where i.user.id = :userId and i.trash = false")

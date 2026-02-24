@@ -69,6 +69,11 @@ public class Insight {
         this.trashedAt = LocalDateTime.now();
     }
 
+    public void restoreFromTrash() {
+        this.trash = false;
+        this.trashedAt = null;
+    }
+
     public void increaseView() {
         this.view++;
     }

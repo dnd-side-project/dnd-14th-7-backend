@@ -10,6 +10,7 @@ import com.dnd.ahaive.domain.insight.exception.InsightAccessDeniedException;
 import com.dnd.ahaive.domain.insight.exception.InsightNotFoundException;
 import com.dnd.ahaive.domain.question.exception.AnswerNotFoundException;
 import com.dnd.ahaive.domain.tag.exception.TagNotFoundException;
+import com.dnd.ahaive.domain.trash.exception.PieceNotFoundException;
 import com.dnd.ahaive.global.common.response.ResponseDTO;
 import com.dnd.ahaive.global.security.exception.UserNotFoundException;
 import com.dnd.ahaive.infra.claude.exception.AiCallException;
@@ -88,6 +89,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   public ResponseEntity<ResponseDTO> handleInvalidInputValue(InvalidInputValueException e) {
     log.warn("입력값 검증 실패: {}", e.getMessage());
     return ResponseEntity.status(e.getErrorCode().getActualStatusCode())
+        .body(ResponseDTO.of(e.getErrorCode()));
+  }
+
+  @ExceptionHandler(PieceNotFoundException.class)
+  public ResponseEntity<ResponseDTO> handlePieceNotFoundException(PieceNotFoundException e) {
+    log.error("인사이트 조각을 찾을 수 없습니다.", e);
+    return ResponseEntity
+        .status(HttpStatus.NOT_FOUND)
         .body(ResponseDTO.of(e.getErrorCode()));
   }
 
