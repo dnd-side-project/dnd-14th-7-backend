@@ -44,7 +44,7 @@ public class TrashListResponse {
                 .filter(piece -> piece.getCreatedType().equals(InsightGenerationType.INIT))
                 .findFirst()
                 .orElseThrow(() -> new PieceNotFoundException(ErrorCode.PIECE_NOT_FOUND))
-                .toString())
+                .getContent())
             .tags(insight.getInsightTags().stream()
                 .map(tag -> TagResponse.builder()
                     .tagId(tag.getTagEntity().getId())
