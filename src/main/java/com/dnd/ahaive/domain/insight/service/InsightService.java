@@ -7,6 +7,7 @@ import com.dnd.ahaive.domain.insight.dto.request.AnswerToInsightRequest;
 import com.dnd.ahaive.domain.insight.dto.request.InsightCreateRequest;
 import com.dnd.ahaive.domain.insight.dto.request.PieceCreateRequest;
 import com.dnd.ahaive.domain.insight.dto.request.PieceUpdateRequest;
+import com.dnd.ahaive.domain.insight.dto.request.TitleUpdateRequest;
 import com.dnd.ahaive.domain.insight.dto.response.AiInsightCandidateResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightCandidateReGenResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightCreateResponse;
@@ -413,5 +414,17 @@ public class InsightService {
     Insight insight = getValidatedInsight(insightId, uuid);
 
     insight.restoreFromTrash();
+  }
+
+  @Transactional
+  public void updateInsightTitle(Long insightId, TitleUpdateRequest titleUpdateRequest, String uuid) {
+    User user = userRepository.findByUserUuid(uuid).orElseThrow(
+        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND)
+    );
+
+    // 인사이트 존재 여부 및 조회 권한 검증
+    Insight insight = getValidatedInsight(insightId, uuid);
+
+    insight.changeTitle(titleUpdateRequest.getTitle());
   }
 }

@@ -52,6 +52,12 @@ public class Insight {
         this.user = user;
     }
 
+    public void changeTitle(String title) {
+        this.title = title;
+    }
+
+    public void changeInitThought(String initThought) {}
+
     @Builder
     private Insight(String initThought, String title, User user) {
         this.initThought = initThought;
