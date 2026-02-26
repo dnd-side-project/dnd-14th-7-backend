@@ -3,6 +3,7 @@ package com.dnd.ahaive.domain.insight.controller;
 import com.dnd.ahaive.domain.insight.dto.request.AnswerToInsightRequest;
 import com.dnd.ahaive.domain.insight.dto.request.InsightCreateRequest;
 import com.dnd.ahaive.domain.insight.dto.request.PieceCreateRequest;
+import com.dnd.ahaive.domain.insight.dto.request.TitleUpdateRequest;
 import com.dnd.ahaive.domain.insight.dto.response.InsightCandidateReGenResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightCreateResponse;
 import com.dnd.ahaive.domain.insight.dto.response.InsightDetailResponse;
@@ -58,6 +59,16 @@ public class InsightController {
     InsightDetailResponse insightDetailResponse = insightService.getInsightDetail(insightId, userDetails.getUuid());
 
     return ResponseDTO.of(insightDetailResponse, "인사이트 상세 조회에 성공하였습니다.");
+  }
+
+  @PatchMapping("/{insightId}/title")
+  public ResponseDTO<?> updateInsightTitle(@PathVariable Long insightId,
+      @Valid @RequestBody TitleUpdateRequest titleUpdateRequest,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+    insightService.updateInsightTitle(insightId, titleUpdateRequest, userDetails.getUuid());
+
+    return ResponseDTO.of("인사이트 제목 수정에 성공하였습니다.");
   }
 
   /**
