@@ -81,4 +81,20 @@ public class TagService {
             return insightTag.getId();
         }
     }
+
+    @Transactional
+    public void removeTag(long tagId, String uuid) {
+
+        User user = userRepository.findByUserUuid(uuid)
+            .orElseThrow(() -> new EntityNotFoundException("해당 회원이 존재하지 않습니다. uuid: " + uuid));
+
+        TagEntity tag = tagEntityRepository.findByIdAndUser(tagId, user)
+            .orElseThrow(() -> new EntityNotFoundException("해당 태그가 존재하지 않습니다. tagId: " + tagId));
+
+        // 인사이트와 연결된 태그 전체 삭제
+        insightTagRepository.deleteByTagEntityId(tagId);
+
+        // 소유한 태그 삭제
+        tagEntityRepository.delete(tag);
+    }
 }

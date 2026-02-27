@@ -51,4 +51,15 @@ public class TagController {
         tagService.addTag(insightId, tagId, userDetails.getUuid());
         return ResponseDTO.of("success");
     }
+
+    /**
+     * 태그 전체 삭제 api 입니다.
+     */
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/api/v1/tag/{tagId}")
+    public ResponseDTO<?> removeTag(@PathVariable("tagId") long tagId,
+                                    @AuthenticationPrincipal CustomUserDetails userDetails) {
+        tagService.removeTag(tagId, userDetails.getUuid());
+        return ResponseDTO.of("success");
+    }
 }
