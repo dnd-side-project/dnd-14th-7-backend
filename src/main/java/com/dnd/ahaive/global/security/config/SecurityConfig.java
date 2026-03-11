@@ -2,6 +2,7 @@ package com.dnd.ahaive.global.security.config;
 
 import com.dnd.ahaive.global.common.response.ResponseDTO;
 import com.dnd.ahaive.global.exception.ErrorCode;
+import com.dnd.ahaive.global.oauth2.CustomOAuth2AuthorizationRequestResolver;
 import com.dnd.ahaive.global.oauth2.OAuth2LoginSuccessHandler;
 import com.dnd.ahaive.global.oauth2.OAuth2UserService;
 import com.dnd.ahaive.global.security.jwt.JwtTokenFilter;
@@ -27,6 +28,7 @@ public class SecurityConfig {
    */
   private final ObjectMapper objectMapper;
   private final OAuth2UserService OAuth2UserService;
+  private final CustomOAuth2AuthorizationRequestResolver customOAuth2AuthorizationRequestResolver;
 
   @Bean
   public BCryptPasswordEncoder passwordEncoder() {
@@ -39,7 +41,7 @@ public class SecurityConfig {
 
     // 인증 실패 시 반환할 JSON 응답
     String invalidAuthenticationResponse = objectMapper
-        .writeValueAsString(ResponseDTO.of(ErrorCode.ACCESS_DENIED));
+        .writeValueAsString(ResponseDTO.of(ErrorCode.UNAUTHORIZED));
 
     // 인가 실패 시 반환할 JSON 응답
     String invalidAuthorizationResponse = objectMapper
@@ -55,7 +57,9 @@ public class SecurityConfig {
                 "/v3/api-docs/**",
                 "/oauth2/**",
                 "/login/oauth2/code/**",
-                "/api/auth/**"
+                "/api/auth/**",
+                "/api/v1/auth/refresh",
+                "/api/health"
             ).permitAll()
             .anyRequest().authenticated()
         )
@@ -63,7 +67,7 @@ public class SecurityConfig {
             //인증 실패 시 응답 핸들링
             .authenticationEntryPoint(((request, response, authException) -> {
               response.setContentType("application/json;charset=UTF-8");
-              response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+              response.setStatus(HttpStatus.UNAUTHORIZED.value());
               response.setContentType("application/json");
               response.getWriter().write(invalidAuthenticationResponse);
             }
@@ -71,13 +75,14 @@ public class SecurityConfig {
             //인가 실패 시 응답 핸들링
             .accessDeniedHandler((request, response, authException) -> {
               response.setContentType("application/json;charset=UTF-8");
-              response.setStatus(HttpStatus.UNAUTHORIZED.value());
+              response.setStatus(HttpStatus.FORBIDDEN.value());
               response.setContentType("application/json");
               response.getWriter().write(invalidAuthorizationResponse);
             }))
         .oauth2Login(oauth2 -> oauth2
             .authorizationEndpoint(authorization -> authorization
                 .baseUri("/oauth2/authorization")
+                .authorizationRequestResolver(customOAuth2AuthorizationRequestResolver)
             )
             .redirectionEndpoint(redirection -> redirection
                 .baseUri("/login/oauth2/code/*"))

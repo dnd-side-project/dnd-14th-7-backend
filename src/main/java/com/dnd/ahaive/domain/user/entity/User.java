@@ -1,6 +1,8 @@
 package com.dnd.ahaive.domain.user.entity;
 
+import com.dnd.ahaive.domain.insight.entity.Insight;
 import com.dnd.ahaive.global.common.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -8,7 +10,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -21,8 +26,8 @@ import lombok.NoArgsConstructor;
 @Table(
     name = "users",
     indexes = {
-        @Index(name = "idx_user_uuid", columnList = "userUuid", unique = true),
-        @Index(name = "idx_provider_id", columnList = "providerId", unique = true)
+        @Index(name = "idx_user_uuid", columnList = "userUuid"),
+        @Index(name = "idx_provider_id", columnList = "providerId")
     }
 
 )
@@ -31,6 +36,7 @@ public class User extends BaseEntity {
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(unique = true)
   private String userUuid;
 
   @Enumerated(EnumType.STRING)
@@ -45,7 +51,14 @@ public class User extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private Provider provider;
 
+  @Enumerated(EnumType.STRING)
+  private Position position;
+
+  @Column(unique = true)
   private String providerId;
+
+  @OneToMany(mappedBy = "user")
+  private List<Insight> insights = new ArrayList<>();
 
   @Builder
   private User(
@@ -55,6 +68,7 @@ public class User extends BaseEntity {
       int credit,
       String email,
       Provider provider,
+      Position position,
       String providerId) {
     this.userUuid = userUuid;
     this.role = role;
@@ -62,6 +76,7 @@ public class User extends BaseEntity {
     this.credit = credit;
     this.email = email;
     this.provider = provider;
+    this.position = position;
     this.providerId = providerId;
   }
 
@@ -71,6 +86,7 @@ public class User extends BaseEntity {
         .role(Role.GUEST)
         .nickname("Guest")
         .credit(credit)
+        .position(Position.NONE)
         .provider(null)
         .providerId(null)
         .build();
@@ -82,12 +98,24 @@ public class User extends BaseEntity {
         .role(Role.MEMBER)
         .nickname(nickname)
         .credit(credit)
+        .position(Position.NONE)
         .email(email)
         .provider(provider)
         .providerId(providerId)
         .build();
   }
 
+  public void addInsight(Insight insight) {
+    insights.add(insight);
+    insight.changeUser(this);
+  }
+
+  public void updatePosition(Position position) {
+    this.position = position;
+  }
 
 
+  public boolean isNotSameUser(String username) {
+    return !this.userUuid.equals(username);
+  }
 }

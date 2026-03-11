@@ -13,6 +13,7 @@ public enum ErrorCode {
     DUPLICATED_BOOKMARK(400, "DUPLICATED_BOOKMARK", "이미 북마크 되어있는 게시글입니다."),
     NOT_LIKE(400,"NOT_LIKE", "좋아요를 누르지 않았습니다."),
     NOT_BOOKMARK(400,"NOT_BOOKMARK", "북마크 되어있지 않은 게시글입니다."),
+    ALREADY_CONVERTED_ANSWER(400, "ALREADY_CONVERTED_ANSWER", "이미 인사이트로 변환된 답변입니다."),
 
     // 400 Bad Request 검색 관련
     INVALID_SEARCH_KEYWORD_LENGTH(400, "INVALID_SEARCH_KEYWORD_LENGTH", "검색어는 2자 이상 입력해주세요."),
@@ -73,6 +74,7 @@ public enum ErrorCode {
     FORBIDDEN(403, "FORBIDDEN", "접근 권한이 없습니다."),
     ACCESS_DENIED(403, "ACCESS_DENIED", "이 기능에 접근할 수 없습니다."),
     INSUFFICIENT_GENERATION_COUNT(403, "INSUFFICIENT_GENERATION_COUNT", "AI 생성 가능 횟수를 모두 사용했습니다."),
+    INSIGHT_ACCESS_DENIED(403, "INSIGHT_ACCESS_DENIED", "해당 인사이트에 대한 접근 권한이 없습니다."),
 
 
     // 404 Not Found
@@ -87,6 +89,12 @@ public enum ErrorCode {
     SCHEDULE_NOT_FOUND(404, "SCHEDULE_NOT_FOUND", "해당 스케쥴을 찾을 수 없습니다."),
     CATEGORY_NOT_FOUND(404, "CATEGORY_NOT_FOUND", "해당 카테고리를 찾을 수 없습니다."),
     COVER_LETTER_NOT_FOUND(404, "COVER_LETTER_NOT_FOUND", "자기소개서를 찾을 수 없습니다."),
+    TOKEN_NOT_FOUND(404, "TOKEN_NOT_FOUND", "토큰이 존재하지 않습니다."),
+    INSIGHT_NOT_FOUND(404, "INSIGHT_NOT_FOUND", "해당 인사이트를 찾을 수 없습니다."),
+    ANSWER_NOT_FOUND(404, "ANSWER_NOT_FOUND", "해당 답변을 찾을 수 없습니다."),
+    TAG_NOT_FOUND(404, "TAG_NOT_FOUND", "해당 태그를 찾을 수 없습니다."),
+    PIECE_NOT_FOUND(404, "PIECE_NOT_FOUND", "해당 인사이트 조각을 찾을 수 없습니다."),
+
 
     // 405 Method Not Allowed
     METHOD_NOT_ALLOWED(405, "METHOD_NOT_ALLOWED", "허용되지 않은 HTTP 메서드입니다."),
@@ -94,8 +102,8 @@ public enum ErrorCode {
     // 500 Internal Server Error
     INTERNAL_SERVER_ERROR(500, "INTERNAL_SERVER_ERROR", "서버 내부 오류가 발생했습니다."),
     VECTOR_EMBEDDING_API_FAILED(500, "VECTOR_EMBEDDING_API_FAILED", "벡터 임베딩 API 호출에 실패했습니다."),
-    UNKNOWN_ERROR(500, "UNKNOWN_ERROR", "예기치 못한 오류가 발생했습니다.");
-
+    UNKNOWN_ERROR(500, "UNKNOWN_ERROR", "예기치 못한 오류가 발생했습니다."),
+    AI_RESPONSE_PARSE_ERROR(500, "AI_RESPONSE_PARSE_ERROR", "AI 응답 파싱에 실패했습니다.");
 
 
     private final Integer customStatusCode;

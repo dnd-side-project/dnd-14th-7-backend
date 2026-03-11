@@ -1,9 +1,26 @@
 package com.dnd.ahaive.global.exception;
 
 
+import com.dnd.ahaive.domain.auth.exception.RefreshTokenInvalid;
+import com.dnd.ahaive.domain.auth.exception.TokenInvalid;
+import com.dnd.ahaive.domain.auth.exception.TokenInvalidType;
+import com.dnd.ahaive.domain.auth.exception.TokenNotFound;
+import com.dnd.ahaive.domain.history.exception.AlreadyConvertedAnswerException;
+import com.dnd.ahaive.domain.insight.exception.InsightAccessDeniedException;
+import com.dnd.ahaive.domain.insight.exception.InsightNotFoundException;
+import com.dnd.ahaive.domain.question.exception.AnswerNotFoundException;
+import com.dnd.ahaive.domain.tag.exception.TagNotFoundException;
+import com.dnd.ahaive.domain.trash.exception.PieceNotFoundException;
 import com.dnd.ahaive.global.common.response.ResponseDTO;
-import groovy.util.logging.Slf4j;
+import com.dnd.ahaive.global.security.exception.UserNotFoundException;
+import com.dnd.ahaive.infra.claude.exception.AiCallException;
+import jakarta.persistence.EntityNotFoundException;
+import com.dnd.ahaive.infra.claude.exception.AiResponseParseException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.reactive.result.method.annotation.ResponseEntityExceptionHandler;
@@ -12,10 +29,144 @@ import org.springframework.web.reactive.result.method.annotation.ResponseEntityE
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-  @ExceptionHandler(VectorEmbeddingException.class)
-  public ResponseEntity<ResponseDTO> vectorEmbeddingException(VectorEmbeddingException e) {
+  @ExceptionHandler(TokenInvalid.class)
+  public ResponseEntity<ResponseDTO> handleTokenInvalidException(TokenInvalid e) {
+    log.error("유효하지 않은 토큰입니다.", e);
+    return ResponseEntity
+        .status(HttpStatus.UNAUTHORIZED)
+        .body(ResponseDTO.of(e.getErrorCode()));
+  }
+
+  @ExceptionHandler(TokenInvalidType.class)
+  public ResponseEntity<ResponseDTO> handleTokenInvalidTypeException(TokenInvalidType e) {
+    log.error("잘못된 토큰 타입입니다.", e);
+    return ResponseEntity
+        .status(HttpStatus.UNAUTHORIZED)
+        .body(ResponseDTO.of(e.getErrorCode()));
+  }
+
+  @ExceptionHandler(TokenNotFound.class)
+  public ResponseEntity<ResponseDTO> handleTokenNotFoundException(TokenNotFound e) {
+    log.error("토큰이 존재하지 않습니다.", e);
+    return ResponseEntity
+        .status(HttpStatus.NOT_FOUND)
+        .body(ResponseDTO.of(e.getErrorCode()));
+  }
+
+  @ExceptionHandler(RefreshTokenInvalid.class)
+  public ResponseEntity<ResponseDTO> handleRefreshTokenInvalidException(RefreshTokenInvalid e) {
+    log.error("유효하지 않은 리프레시 토큰입니다.", e);
+    return ResponseEntity
+        .status(HttpStatus.UNAUTHORIZED)
+        .body(ResponseDTO.of(e.getErrorCode()));
+  }
+
+  @ExceptionHandler(UserNotFoundException.class)
+  public ResponseEntity<ResponseDTO> handleUserNotFoundException(UserNotFoundException e) {
+    log.error("사용자를 찾을 수 없습니다.", e);
+    return ResponseEntity
+        .status(HttpStatus.NOT_FOUND)
+        .body(ResponseDTO.of(e.getErrorCode()));
+  }
+
+  @ExceptionHandler(AiCallException.class)
+  public ResponseEntity<ResponseDTO> handleAiCallException(AiCallException e) {
+    log.error("AI 호출 중 예외가 발생했습니다.", e);
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(ResponseDTO.of(e.getErrorCode()));
+  }
+
+  @ExceptionHandler(TagNotFoundException.class)
+  public ResponseEntity<ResponseDTO> handleTagNotFoundException(TagNotFoundException e) {
+    log.error("태그를 찾을 수 없습니다.", e);
+    return ResponseEntity
+        .status(HttpStatus.NOT_FOUND)
+        .body(ResponseDTO.of(e.getErrorCode()));
+  }
+
+  @ExceptionHandler(InvalidInputValueException.class)
+  public ResponseEntity<ResponseDTO> handleInvalidInputValue(InvalidInputValueException e) {
+    log.warn("입력값 검증 실패: {}", e.getMessage());
     return ResponseEntity.status(e.getErrorCode().getActualStatusCode())
         .body(ResponseDTO.of(e.getErrorCode()));
+  }
+
+  @ExceptionHandler(PieceNotFoundException.class)
+  public ResponseEntity<ResponseDTO> handlePieceNotFoundException(PieceNotFoundException e) {
+    log.error("인사이트 조각을 찾을 수 없습니다.", e);
+    return ResponseEntity
+        .status(HttpStatus.NOT_FOUND)
+        .body(ResponseDTO.of(e.getErrorCode()));
+  }
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<ResponseDTO> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
+    log.warn("입력값 검증 실패: {}", e.getBindingResult().getFieldErrors());
+    return ResponseEntity.status(ErrorCode.INVALID_INPUT_VALUE.getActualStatusCode())
+        .body(ResponseDTO.of(ErrorCode.INVALID_INPUT_VALUE));
+  }
+
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public ResponseEntity<ResponseDTO> handleHttpMessageNotReadable(HttpMessageNotReadableException e) {
+    log.warn("잘못된 요청 값: {}", e.getMessage());
+    return ResponseEntity.status(ErrorCode.INVALID_INPUT_VALUE.getActualStatusCode())
+        .body(ResponseDTO.of(ErrorCode.INVALID_INPUT_VALUE));
+  }
+
+  @ExceptionHandler(EntityNotFoundException.class)
+  public ResponseEntity<ResponseDTO> handleEntityNotFoundException(EntityNotFoundException e) {
+    log.error(e.getMessage());
+    return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(ResponseDTO.notFound(e.getMessage()));
+  }
+  @ExceptionHandler(InsightNotFoundException.class)
+  public ResponseEntity<ResponseDTO> handleInsightNotFoundException(InsightNotFoundException e) {
+    log.error(e.getMessage());
+    return ResponseEntity
+        .status(HttpStatus.NOT_FOUND)
+        .body(ResponseDTO.of(ErrorCode.INSIGHT_NOT_FOUND));
+  }
+
+  @ExceptionHandler(InsightAccessDeniedException.class)
+  public ResponseEntity<ResponseDTO> handleInsightAccessDeniedException(InsightAccessDeniedException e) {
+    log.error(e.getMessage());
+    return ResponseEntity
+        .status(HttpStatus.FORBIDDEN)
+        .body(ResponseDTO.of(ErrorCode.INSIGHT_ACCESS_DENIED));
+  }
+
+  @ExceptionHandler(AiResponseParseException.class)
+  public ResponseEntity<ResponseDTO> handleAiResponseParseException(AiResponseParseException e) {
+    log.error("AI 응답 파싱에 실패했습니다.", e);
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(ResponseDTO.of(e.getErrorCode()));
+  }
+
+  @ExceptionHandler(AnswerNotFoundException.class)
+  public ResponseEntity<ResponseDTO> handleAnswerNotFoundException(AnswerNotFoundException e) {
+    log.error("해당 답변을 찾을 수 없습니다.", e);
+    return ResponseEntity
+        .status(HttpStatus.NOT_FOUND)
+        .body(ResponseDTO.of(ErrorCode.ANSWER_NOT_FOUND));
+  }
+
+  @ExceptionHandler(AlreadyConvertedAnswerException.class)
+  public ResponseEntity<ResponseDTO> handleAlreadyConvertedAnswerException(AlreadyConvertedAnswerException e) {
+    log.error("이미 인사이트 조각으로 변환된 답변입니다.", e);
+    return ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+        .body(ResponseDTO.of(ErrorCode.ALREADY_CONVERTED_ANSWER));
+  }
+
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<ResponseDTO> handleException(Exception e) {
+    log.error("처리되지 않은 예외 발생", e);
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(ResponseDTO.of(ErrorCode.INTERNAL_SERVER_ERROR));
   }
 
 }
